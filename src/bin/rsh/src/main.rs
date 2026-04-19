@@ -53,7 +53,7 @@ fn main() {
     loop {
         let prompt = match env::current_dir() {
             Ok(path) => {
-                format!("{}$", path.display())
+                format!("{}$ ", path.display())
             }
             Err(_) => {
                 "$ ".to_string()
