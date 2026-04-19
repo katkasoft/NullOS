@@ -2,3 +2,4 @@ vmlinuz
 rootfs
 .DS_Store
 target
+initramfs.cpio.gz
