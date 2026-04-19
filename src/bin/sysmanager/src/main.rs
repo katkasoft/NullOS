@@ -1,16 +1,10 @@
 use std::io::{self, Write};
 use std::process;
 
-const LINUX_REBOOT_MAGIC1: i32 = 0xfee1dead;
-const LINUX_REBOOT_MAGIC2: i32 = 0x28121969;
-const LINUX_REBOOT_CMD_RESTART: i32 = 0x01234567;
-const LINUX_REBOOT_CMD_POWER_OFF: i32 = 0x4321fedc;
-const LINUX_REBOOT_CMD_HALT: i32 = 0xcdef0123;
-
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     if args.len() != 2 {
-        eprintln!("Usage: {} [poweroff|reboot|halt]", args[0]);
+        eprintln!("Usage: sysmanager [poweroff|reboot|halt]");
         process::exit(1);
     }
 
@@ -20,17 +14,17 @@ fn main() {
         "poweroff" => {
             print!("Powering off system... ");
             io::stdout().flush().unwrap();
-            LINUX_REBOOT_CMD_POWER_OFF
+            libc::LINUX_REBOOT_CMD_POWER_OFF
         }
         "reboot" => {
             print!("Rebooting system... ");
             io::stdout().flush().unwrap();
-            LINUX_REBOOT_CMD_RESTART
+            libc::LINUX_REBOOT_CMD_RESTART
         }
         "halt" => {
             print!("Halting system... ");
             io::stdout().flush().unwrap();
-            LINUX_REBOOT_CMD_HALT
+            libc::LINUX_REBOOT_CMD_HALT
         }
         _ => {
             eprintln!("Unknown command: {}", args[1]);
@@ -39,12 +33,7 @@ fn main() {
     };
 
     unsafe {
-        let ret = libc::reboot(
-            LINUX_REBOOT_MAGIC1,
-            LINUX_REBOOT_MAGIC2,
-            cmd,
-            std::ptr::null_mut(),
-        );
+        let ret = libc::reboot(cmd);
         if ret != 0 {
             eprintln!("\nFailed to {}: {}", args[1], io::Error::last_os_error());
             process::exit(1);
