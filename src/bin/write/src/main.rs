@@ -1,10 +1,11 @@
 use std::{io, env};
 use std::fs::OpenOptions;
 use std::io::Write;
+use std::fs;
 
 fn main() -> io::Result<()> {
     let args: Vec<String> = env::args().collect();
-    let accepted_params: Vec<String> = vec![];
+    let accepted_params: Vec<String> = vec!["a".to_string()];
     let mut params: Vec<String> = vec![];
     let mut filtered: Vec<String> = vec![];
     if args.len() == 1 {
@@ -30,6 +31,15 @@ fn main() -> io::Result<()> {
             .create(true)
             .open(filtered[0].clone())?;
         println!("Write v0.1. Enter q to exit");
+        if params.contains(&"a".to_string()) {
+            let contents = fs::read_to_string(filtered[0].to_string())?;
+            println!("{}", contents);
+        } else {
+            if let Err(e) = fs::write(&filtered[0], "") {
+                eprintln!("Error while writing to file: {}", e);
+                std::process::exit(1);
+            }
+        }
         loop {
             let mut input = String::new();
             print!(">");
@@ -45,9 +55,19 @@ fn main() -> io::Result<()> {
         }
     } else {
         let content = filtered[1..].join(" ");
-        if let Err(e) = std::fs::write(&filtered[0], content) {
-            eprintln!("Error while writing to file: {}", e);
-            std::process::exit(1);
+        if params.contains(&"a".to_string()) {
+            let mut file = OpenOptions::new()
+                .append(true)
+                .create(true)
+                .open(filtered[0].clone())?;
+            if let Err(e) = writeln!(file, "{}", content) {
+                eprintln!("Error while writing to file: {}", e);
+            }
+        } else {
+            if let Err(e) = fs::write(&filtered[0], content) {
+                eprintln!("Error while writing to file: {}", e);
+                std::process::exit(1);
+            }
         }
     }
     Ok(())
