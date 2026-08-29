@@ -1,7 +1,6 @@
 use std::env;
 use std::fs::File;
-use std::io::Read;
-use std::io;
+use std::io::{self, BufRead, BufReader};
 use std::path::Path;
 
 fn main() -> io::Result<()> {
@@ -16,11 +15,12 @@ fn main() -> io::Result<()> {
             eprintln!("File not found: {}", arg);
             continue;
         }
-        let mut file = File::open(arg)?;
-        let mut contents = String::new();
-        file.read_to_string(&mut contents)?;
-        println!("{}", contents);
+        let file = File::open(arg)?;
+        let reader = BufReader::new(file);
+        for line in reader.lines() {
+            let line = line?;
+            println!("{}", line);
+        }
     }
-
     Ok(())
 }
