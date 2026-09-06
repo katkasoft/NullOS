@@ -7,8 +7,8 @@ fn main() -> io::Result<()> {
         println!("Usage: mv [source] [destitation]");
         std::process::exit(1);
     }
-    let source = args[0].clone();
-    let destitation = args[1].clone();
+    let source = args[1].clone();
+    let destitation = args[2].clone();
     if destitation.chars().last() == Some('/') {
         let source_path = Path::new(&source);
         let file_name = source_path
