@@ -6,7 +6,7 @@ fn main() -> io::Result<()> {
     let accepted_params: Vec<String> = vec!["r".to_string()];
     let mut params: Vec<String> = vec![];
     let mut files: Vec<String> = vec![];
-    if args.len() == 1 {
+    if args.len() < 3 {
         eprintln!("Usage: cp [file|dir] [destination] [params]");
         std::process::exit(1);
     }

@@ -6,7 +6,7 @@ fn main() -> io::Result<()> {
     let accepted_params: Vec<String> = vec!["p".to_string()];
     let mut params: Vec<String> = vec![];
     let mut dirs: Vec<String> = vec![];
-    if args.len() == 1 {
+    if args.len() < 2 {
         eprintln!("Usage: rmdir [dir(s)] [params]");
         std::process::exit(1);
     }
