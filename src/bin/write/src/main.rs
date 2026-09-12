@@ -33,7 +33,7 @@ fn main() -> io::Result<()> {
         println!("Write v0.1. Enter q to exit");
         if params.contains(&"a".to_string()) {
             let contents = fs::read_to_string(filtered[0].to_string())?;
-            println!("{}", contents);
+            print!("{}", contents);
         } else {
             if let Err(e) = fs::write(&filtered[0], "") {
                 eprintln!("Error while writing to file: {}", e);
@@ -42,14 +42,13 @@ fn main() -> io::Result<()> {
         }
         loop {
             let mut input = String::new();
-            print!(">");
             io::stdin()
                 .read_line(&mut input)
                 .expect("Failed to read line");
             if input == "q\n" {
                 break
             }
-            if let Err(e) = writeln!(file, "{}", input) {
+            if let Err(e) = write!(file, "{}", input) {
                 eprintln!("Error while writing to file: {}", e);
             }
         }
@@ -60,7 +59,7 @@ fn main() -> io::Result<()> {
                 .append(true)
                 .create(true)
                 .open(filtered[0].clone())?;
-            if let Err(e) = writeln!(file, "{}", content) {
+            if let Err(e) = write!(file, "{}", content) {
                 eprintln!("Error while writing to file: {}", e);
             }
         } else {
