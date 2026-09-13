@@ -1,7 +1,7 @@
 use rustyline::DefaultEditor;
 use std::process::Command;
 use std::path::Path;
-use std::env;
+use std::{env, print, println};
 
 fn run_command(cmd: &str, args: &[&str]) {
     let paths = ["/bin", "/sbin", "/usr/bin"];
@@ -48,6 +48,17 @@ fn builtin_pwd() {
     }
 }
 
+fn builtin_clear() {
+    println!("\x1B[2J\x1b[1;1H");
+}
+
+fn builtin_echo(args: &[&str]) {
+    for arg in args.iter() {
+        print!("{} ", arg);
+    }
+    println!();
+}
+
 fn main() {
     let mut rl = DefaultEditor::new().unwrap();
     loop {
@@ -76,6 +87,8 @@ fn main() {
                 match cmd {
                     "cd" => builtin_cd(&args),
                     "pwd" => builtin_pwd(),
+                    "clear" => builtin_clear(),
+                    "echo" => builtin_echo(&args),
                     _ => run_command(cmd, &args),
                 }
             }
