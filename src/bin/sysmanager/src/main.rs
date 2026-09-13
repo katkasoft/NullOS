@@ -11,12 +11,12 @@ fn main() {
     unsafe { libc::sync(); }
 
     let cmd = match args[1].as_str() {
-        "poweroff" || "shutdown" => {
+        "poweroff"| "shutdown" => {
             print!("Powering off system... ");
             io::stdout().flush().unwrap();
             libc::LINUX_REBOOT_CMD_POWER_OFF
         }
-        "reboot" || "restart" => {
+        "reboot" | "restart" => {
             print!("Rebooting system... ");
             io::stdout().flush().unwrap();
             libc::LINUX_REBOOT_CMD_RESTART
