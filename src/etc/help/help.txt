@@ -17,6 +17,8 @@ rm [file/dir] - Remove file or directory
 rmdir [dir] - Remove empty directory
 cp [file/dir] [destitation] - Copy file or directory
 mv [file] [destitation] - Move or rename file
+head [file] - Read first lines of file
+tail [file] - Read last lines of file
 
 System commands:
 sysmanager reboot/restart - Reboot system
