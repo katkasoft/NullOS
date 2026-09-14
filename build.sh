@@ -38,6 +38,8 @@ if [ ! -f rootfs/sbin/init ]; then
     exit 1
 fi
 
+cp -r src/etc rootfs
+
 echo "[*] Packing initramfs..."
 pushd rootfs > /dev/null
 find . | cpio -o -H newc | gzip > ../initramfs.cpio.gz
