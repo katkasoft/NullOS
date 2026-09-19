@@ -14,6 +14,7 @@ touch [file] - Create file or update modified and accesed time
 cat [file] - Read contents of file
 write [file] [contents] - Write to file
 rm [file/dir] - Remove file or directory
+mkdir [dir]
 rmdir [dir] - Remove empty directory
 cp [file/dir] [destitation] - Copy file or directory
 mv [file] [destitation] - Move or rename file
@@ -24,6 +25,9 @@ System commands:
 sysmanager reboot/restart - Reboot system
 sysmanager shutdown/poweroff - Power off system
 sysmanager halt - Halt system
+
+Processes management:
+ps - List all processes and its stats
 
 Other commands: 
 help [command] - Display manual for command(s)
