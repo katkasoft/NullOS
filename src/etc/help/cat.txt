@@ -1,0 +1,7 @@
+cat - read file contents
+
+Usage:
+    cat [file]
+
+Prints the contents of the given file line by line.
+If the file does not exist, prints an error and continues with the next one.

@@ -1,0 +1,7 @@
+mv - move or rename files
+
+Usage:
+    mv [source] [destination]
+
+Moves or renames a file or directory.
+If destination ends with /, the source is moved inside it.

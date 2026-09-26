@@ -1,0 +1,7 @@
+cp - copy files and directories
+
+Usage:
+    cp [file|dir] [destination] [-r]
+
+Copies a file or directory to the destination.
+Use -r to copy directories recursively.

@@ -1,0 +1,7 @@
+rmdir - remove empty directories
+
+Usage:
+    rmdir [dir] [-p]
+
+Removes an empty directory.
+With -p removes the directory and its empty parents.

@@ -1,0 +1,10 @@
+mkdir - create directories
+
+Usage:
+    mkdir [dir] [-p]
+
+Creates a directory.
+With -p creates all parent directories if needed.
+Example:
+    mkdir /home/user/docs
+    mkdir -p /a/b/c/d

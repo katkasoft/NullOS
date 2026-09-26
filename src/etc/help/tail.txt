@@ -1,0 +1,8 @@
+tail - show last lines of a file
+
+Usage:
+    tail [file]
+    tail [file] -n [lines]
+
+By default prints the last 10 lines.
+With -n you can specify how many lines to print.

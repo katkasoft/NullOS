@@ -1,0 +1,9 @@
+sysmanager - manage system power
+
+Usage:
+    sysmanager [poweroff|reboot|halt]
+
+Controls the system power state.
+    poweroff (shutdown) - power off the system
+    reboot (restart)    - reboot the system
+    halt                - halt the system

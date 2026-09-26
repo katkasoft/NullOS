@@ -1,0 +1,8 @@
+write - write to a file
+
+Usage:
+    write [file] [content] [-a]
+    write [file]
+
+Without content, opens interactive mode. Type q on a new line to exit.
+With -a appends to the file instead of overwriting.

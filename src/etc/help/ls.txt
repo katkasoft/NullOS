@@ -1,0 +1,9 @@
+ls - list directory contents
+
+Usage:
+    ls [dir] [-a] [-f]
+
+Lists files and directories in the given directory.
+Without arguments, lists the current directory.
+-a shows hidden files.
+-f prints full paths.

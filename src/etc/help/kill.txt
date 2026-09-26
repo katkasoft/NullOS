@@ -1,0 +1,9 @@
+kill - send a signal to a process
+
+Usage:
+    kill -[signal] [pid]
+
+Sends a signal to the process with the given PID.
+Default signal is 15 (SIGTERM).
+Example:
+    kill -9 1234

@@ -1,0 +1,10 @@
+killall - kill processes by name
+
+Usage:
+    killall [-signal] [process]
+
+Kills all processes with the given name.
+Default signal is 15 (SIGTERM).
+Example:
+    killall bash
+    killall -9 rsh

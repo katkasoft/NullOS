@@ -1,0 +1,7 @@
+touch - create file or update timestamps
+
+Usage:
+    touch [file]
+
+Creates an empty file if it does not exist.
+If the file exists, updates its access and modification time.

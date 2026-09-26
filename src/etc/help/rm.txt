@@ -1,0 +1,8 @@
+rm - remove files and directories
+
+Usage:
+    rm [file|dir] [-r] [-f]
+
+Removes files or directories.
+-r removes directories recursively.
+-f ignores missing files.

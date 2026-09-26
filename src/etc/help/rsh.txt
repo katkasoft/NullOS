@@ -1,0 +1,8 @@
+rsh - NullOS shell
+
+Usage:
+    rsh
+
+The NullOS command shell.
+Supports built-in commands (cd, pwd, echo, clear, exit)
+and external commands from /bin, /sbin, /usr/bin.

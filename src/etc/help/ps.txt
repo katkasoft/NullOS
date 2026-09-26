@@ -1,0 +1,7 @@
+ps - list running processes
+
+Usage:
+    ps
+
+Lists all processes with PID, UID, TTY, state and command.
+Kernel threads are shown in [brackets].
