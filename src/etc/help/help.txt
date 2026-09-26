@@ -1,5 +1,5 @@
 NullOS v0.1 help
-List of all aviable commands:
+List of all avilable commands:
 
 Shell commands:
 cd [dir] - Change working directory
@@ -10,14 +10,14 @@ exit - Exit shell
 
 File management:
 ls [dir] - List files and directories in directory
-touch [file] - Create file or update modified and accesed time
+touch [file] - Create file or update modified and accessed time
 cat [file] - Read contents of file
 write [file] [contents] - Write to file
 rm [file/dir] - Remove file or directory
-mkdir [dir]
+mkdir [dir] - Create empty directory
 rmdir [dir] - Remove empty directory
-cp [file/dir] [destitation] - Copy file or directory
-mv [file] [destitation] - Move or rename file
+cp [file/dir] [destination] - Copy file or directory
+mv [file] [destination] - Move or rename file
 head [file] - Read first lines of file
 tail [file] - Read last lines of file
 
@@ -26,8 +26,9 @@ sysmanager reboot/restart - Reboot system
 sysmanager shutdown/poweroff - Power off system
 sysmanager halt - Halt system
 
-Processes management:
-ps - List all processes and its stats
+Process management:
+ps - List all processes and their stats
+kill -[signal] [pid] - Kill process by pid
+killall -[signal] [process] - Kill all processes by name
 
-Other commands: 
-help [command] - Display manual for command(s)
+To see manual for command type help [command]
