@@ -95,6 +95,15 @@ fn run_script(path: &str) -> io::Result<()> {
 fn main() -> io::Result<()> {
     let args: Vec<String> = env::args().skip(1).collect(); 
     if args.is_empty() {
+        if Path::new("/etc/rshrc").exists() {
+            let _ = run_script("/etc/rshrc");
+        }
+        if let Ok(home) = env::var("HOME") {
+            let path = format!("{}/.rshrc", home);
+            if Path::new(&path).exists() {
+                let _ = run_script(&path);
+            }
+        }
         let mut rl = DefaultEditor::new().unwrap();
         loop {
             let prompt = match env::current_dir() {

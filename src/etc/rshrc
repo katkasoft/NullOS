@@ -1,0 +1,2 @@
+#This is the system-wide rshrc script, which runs on the rsh start
+echo NullOS rsh v0.1
