@@ -1,9 +1,62 @@
-use rustyline::DefaultEditor;
+use rustyline::history::DefaultHistory;
+use rustyline::Editor;
 use std::process::Command;
 use std::path::Path;
 use std::{env, print, println};
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
+use rustyline::completion::{Completer, Pair};
+use rustyline::highlight::Highlighter;
+use rustyline::hint::Hinter;
+use rustyline::validate::Validator;
+use rustyline::{Context, Helper, Result as RlResult};
+
+struct RshHelper;
+
+impl Helper for RshHelper {}
+impl Hinter for RshHelper {
+    type Hint = String;
+}
+impl Highlighter for RshHelper {}
+impl Validator for RshHelper {}
+
+impl Completer for RshHelper {
+    type Candidate = Pair;
+
+    fn complete(
+        &self,
+        line: &str,
+        pos: usize,
+        _ctx: &Context<'_>,
+    ) -> RlResult<(usize, Vec<Pair>)> {
+        let before_cursor = &line[..pos];
+        let word_start = before_cursor.rfind(' ').map(|i| i + 1).unwrap_or(0);
+        let word = &before_cursor[word_start..];
+
+        let mut candidates = Vec::new();
+
+        if let Ok(entries) = std::fs::read_dir(".") {
+            for entry in entries.flatten() {
+                let name = entry.file_name().to_string_lossy().into_owned();
+                if name.starts_with(word) {
+                    let is_dir = entry.file_type().map(|t| t.is_dir()).unwrap_or(false);
+                    let replacement = if is_dir {
+                        format!("{}/", name)
+                    } else {
+                        name.clone()
+                    };
+                    candidates.push(Pair {
+                        display: name,
+                        replacement,
+                    });
+                }
+            }
+        }
+
+        candidates.sort_by(|a, b| a.display.cmp(&b.display));
+        Ok((word_start, candidates))
+    }
+}
 
 fn run_command(cmd: &str, args: &[&str]) {
     let paths = ["/bin", "/sbin", "/usr/bin"];
@@ -104,7 +157,8 @@ fn main() -> io::Result<()> {
                 let _ = run_script(&path);
             }
         }
-        let mut rl = DefaultEditor::new().unwrap();
+        let mut rl: Editor<RshHelper, DefaultHistory> = Editor::new().unwrap();
+        rl.set_helper(Some(RshHelper));
         loop {
             let prompt = match env::current_dir() {
                 Ok(path) => {
@@ -119,7 +173,7 @@ fn main() -> io::Result<()> {
                 Ok(input) => {
                     let _ = rl.add_history_entry(input.as_str());
                     run_line(&input);
-                }
+                }   
                 Err(_) => break,
             }
         }
