@@ -10,6 +10,7 @@ use rustyline::highlight::Highlighter;
 use rustyline::hint::Hinter;
 use rustyline::validate::Validator;
 use rustyline::{Context, Helper, Result as RlResult};
+use std::collections::HashMap;
 
 struct RshHelper;
 
@@ -58,24 +59,63 @@ impl Completer for RshHelper {
     }
 }
 
-fn run_command(cmd: &str, args: &[&str]) {
-    let paths = ["/bin", "/sbin", "/usr/bin"];
+struct Shell {
+    vars: HashMap<String, String>,
+}
+
+impl Shell {
+    fn new() -> Self {
+        let mut vars = HashMap::new();
+        for (k, v) in env::vars() {
+            vars.insert(k, v);
+        }
+        if !vars.contains_key("PATH") {
+            vars.insert("PATH".to_string(), "/bin:/sbin:/usr/bin".to_string());
+        }
+        Shell { vars }
+    }
+}
+
+fn builtin_export(shell: &mut Shell, args: &[&str]) {
+    if args.is_empty() {
+        for (k, v) in &shell.vars {
+            println!("{}={}", k, v);
+        }
+        return
+    }
+    for arg in args {
+        if let Some((key, value)) = arg.split_once('=') {
+            shell.vars.insert(key.to_string(), value.to_string());
+        } else {
+            eprintln!("export: invalid format: {}", arg);
+        }
+    }
+}
+
+fn builtin_env(shell: &Shell) {
+    for (k, v) in &shell.vars {
+        println!("{}={}", k, v);
+    }
+}
+
+fn run_command(shell: &Shell, cmd: &str, args: &[&str]) {
+    let path = shell.vars.get("PATH").map(|s| s.as_str()).unwrap_or("/bin:/sbin:/usr/bin");
     if cmd.contains('/') {
-        execute(cmd, args);
+        execute(shell, cmd, args);
         return;
     }
-    for dir in &paths {
+    for dir in path.split(':') {
         let full_path = format!("{}/{}", dir, cmd);
         if Path::new(&full_path).exists() {
-            execute(&full_path, args);
+            execute(shell, &full_path, args);
             return;
         }
     }
     eprintln!("command not found: {}", cmd);
 }
 
-fn execute(path: &str, args: &[&str]) {
-    match Command::new(path).args(args).spawn() {
+fn execute(shell: &Shell, path: &str, args: &[&str]) {
+    match Command::new(path).args(args).envs(&shell.vars).spawn() {
         Ok(mut child) => {
             let _ = child.wait();
         }
@@ -114,7 +154,7 @@ fn builtin_echo(args: &[&str]) {
     println!();
 }
 
-fn run_line(input: &str) {
+fn run_line(shell: &mut Shell, input: &str) {
     let input = input.trim();
     if input.is_empty() || input.starts_with('#') {
         return;
@@ -130,50 +170,48 @@ fn run_line(input: &str) {
         "pwd" => builtin_pwd(),
         "clear" => builtin_clear(),
         "echo" => builtin_echo(&args),
+        "env" => builtin_env(shell),
+        "export" => builtin_export(shell, &args),
         "exit" => std::process::exit(0),
-        _ => run_command(cmd, &args),
+        _ => run_command(shell, cmd, &args),
     }
 }
 
-fn run_script(path: &str) -> io::Result<()> {
+fn run_script(shell: &mut Shell, path: &str) -> io::Result<()> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     for line in reader.lines() {
         let line = line?;
-        run_line(&line);
+        run_line(shell, &line);
     }
     Ok(())
 }
 
 fn main() -> io::Result<()> {
-    let args: Vec<String> = env::args().skip(1).collect(); 
+    let args: Vec<String> = env::args().skip(1).collect();
     if args.is_empty() {
+        let mut shell = Shell::new();
         if Path::new("/etc/rshrc").exists() {
-            let _ = run_script("/etc/rshrc");
+            let _ = run_script(&mut shell, "/etc/rshrc");
         }
         if let Ok(home) = env::var("HOME") {
             let path = format!("{}/.rshrc", home);
             if Path::new(&path).exists() {
-                let _ = run_script(&path);
+                let _ = run_script(&mut shell, &path);
             }
         }
         let mut rl: Editor<RshHelper, DefaultHistory> = Editor::new().unwrap();
         rl.set_helper(Some(RshHelper));
         loop {
             let prompt = match env::current_dir() {
-                Ok(path) => {
-                    format!("{}$ ", path.display())
-                }
-                Err(_) => {
-                    "$ ".to_string()
-                }
+                Ok(path) => format!("{}$ ", path.display()),
+                Err(_) => "$ ".to_string(),
             };
-            let line = rl.readline(&prompt);
-            match line {
+            match rl.readline(&prompt) {
                 Ok(input) => {
                     let _ = rl.add_history_entry(input.as_str());
-                    run_line(&input);
-                }   
+                    run_line(&mut shell, &input);
+                }
                 Err(_) => break,
             }
         }
@@ -182,10 +220,12 @@ fn main() -> io::Result<()> {
             eprintln!("rsh: -c requires an argument");
             std::process::exit(1);
         }
-        run_line(&args[1]);
+        let mut shell = Shell::new();
+        run_line(&mut shell, &args[1]);
     } else {
+        let mut shell = Shell::new();
         for arg in args.iter() {
-            if let Err(e) = run_script(arg) {
+            if let Err(e) = run_script(&mut shell, arg) {
                 eprintln!("rsh: {}: {}", arg, e);
                 std::process::exit(1);
             }
