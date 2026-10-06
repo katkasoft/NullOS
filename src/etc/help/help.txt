@@ -1,11 +1,14 @@
 NullOS v0.1 help
-List of all avilable commands:
+List of all available commands:
 
 Shell commands:
 cd [dir] - Change working directory
 pwd - Print working directory
 echo [text] - Print text
 clear - Clear screen
+export [VAR=value] - Set environment variable
+unset [VAR] - Remove environment variable
+env - Print all environment variables
 exit - Exit shell
 
 File management:

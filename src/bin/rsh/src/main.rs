@@ -76,7 +76,7 @@ impl Shell {
     }
 }
 
-fn builtin_export(shell: &mut Shell, args: &[&str]) {
+fn builtin_export(shell: &mut Shell, args: &[String]) {
     if args.is_empty() {
         for (k, v) in &shell.vars {
             println!("{}={}", k, v);
@@ -92,13 +92,19 @@ fn builtin_export(shell: &mut Shell, args: &[&str]) {
     }
 }
 
+fn builtin_unset(shell: &mut Shell, args: &[String]) {
+    for arg in args {
+        shell.vars.remove(arg);
+    }
+}
+
 fn builtin_env(shell: &Shell) {
     for (k, v) in &shell.vars {
         println!("{}={}", k, v);
     }
 }
 
-fn run_command(shell: &Shell, cmd: &str, args: &[&str]) {
+fn run_command(shell: &Shell, cmd: &str, args: &[String]) {
     let path = shell.vars.get("PATH").map(|s| s.as_str()).unwrap_or("/bin:/sbin:/usr/bin");
     if cmd.contains('/') {
         execute(shell, cmd, args);
@@ -114,7 +120,7 @@ fn run_command(shell: &Shell, cmd: &str, args: &[&str]) {
     eprintln!("command not found: {}", cmd);
 }
 
-fn execute(shell: &Shell, path: &str, args: &[&str]) {
+fn execute(shell: &Shell, path: &str, args: &[String]) {
     match Command::new(path).args(args).envs(&shell.vars).spawn() {
         Ok(mut child) => {
             let _ = child.wait();
@@ -125,11 +131,11 @@ fn execute(shell: &Shell, path: &str, args: &[&str]) {
     }
 }
 
-fn builtin_cd(args: &[&str]) {
+fn builtin_cd(shell: &Shell, args: &[String]) {
     let target = if args.is_empty() {
-        env::var("HOME").unwrap_or_else(|_| "/".to_string())
+        shell.vars.get("HOME").cloned().unwrap_or_else(|| "/".to_string())
     } else {
-        args[0].to_string()
+        args[0].clone()
     };
     if let Err(e) = env::set_current_dir(&target) {
         eprintln!("cd: {}: {}", target, e);
@@ -147,7 +153,7 @@ fn builtin_clear() {
     println!("\x1B[2J\x1b[1;1H");
 }
 
-fn builtin_echo(args: &[&str]) {
+fn builtin_echo(args: &[String]) {
     for arg in args.iter() {
         print!("{} ", arg);
     }
@@ -164,14 +170,23 @@ fn run_line(shell: &mut Shell, input: &str) {
         Some(c) => c,
         None => return,
     };
-    let args: Vec<&str> = parts.collect();
+    let args: Vec<String> = parts.map(|s| {
+        if let Some(key) = s.strip_prefix('$') {
+            if let Some(value) = shell.vars.get(key) {
+                return value.clone();
+            }
+        }
+        s.to_string()
+    }).collect();
+
     match cmd {
-        "cd" => builtin_cd(&args),
+        "cd" => builtin_cd(shell, &args),
         "pwd" => builtin_pwd(),
         "clear" => builtin_clear(),
         "echo" => builtin_echo(&args),
         "env" => builtin_env(shell),
         "export" => builtin_export(shell, &args),
+        "unset" => builtin_unset(shell, &args),
         "exit" => std::process::exit(0),
         _ => run_command(shell, cmd, &args),
     }

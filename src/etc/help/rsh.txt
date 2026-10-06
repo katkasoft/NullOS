@@ -21,10 +21,19 @@ On interactive startup, rsh runs:
     $HOME/.rshrc     - user config
 
 Built-in commands:
-    cd [dir]    - change directory (no args -> $HOME)
-    pwd         - print working directory
-    echo [text] - print text
-    clear       - clear the screen
-    exit        - exit the shell
+    cd [dir]         - change directory (no args -> $HOME)
+    pwd              - print working directory
+    echo [text]      - print text
+    clear            - clear the screen
+    export [VAR=val] - set environment variable
+    unset [VAR]      - remove environment variable
+    env              - print all environment variables
+    exit             - exit the shell
+
+Environment:
+    Variables are stored in the shell and inherited by child processes.
+    Use export VAR=value to set, unset VAR to remove, env to list all.
+    $VAR in command arguments is replaced with the variable value.
+    External commands are searched using the PATH variable.
 
 External commands are searched in /bin, /sbin and /usr/bin.
