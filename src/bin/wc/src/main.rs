@@ -1,0 +1,44 @@
+use std::env;
+use std::fs::File;
+use std::io::{self, BufRead, BufReader, Read};
+
+fn main() -> io::Result<()> {
+    let args: Vec<String> = env::args().skip(1).collect();
+    if args.len() != 2 {
+        eprintln!("Usage: wc [-l|-w|-c|-m] [file]");
+        std::process::exit(1);
+    }
+    let file = File::open(&args[1])?;
+    let mut reader = BufReader::new(file);
+    let mut count = 0;
+    match args[0].as_str() {
+        "-l" => {
+            for line in reader.lines() {
+                let _line = line?;
+                count += 1;
+            }
+        }
+        "-w" => {
+            for line in reader.lines() {
+                let line = line?;
+                count += line.split_whitespace().count();
+            }
+        }
+        "-c" => {
+            let mut buf = Vec::new();
+            reader.read_to_end(&mut buf)?;
+            count = buf.len();
+        }
+        "-m" => {
+            let mut s = String::new();
+            reader.read_to_string(&mut s)?;
+            count = s.chars().count();
+        }
+        _ => {
+            eprintln!("No such parameter: {}", args[0]);
+            std::process::exit(1);
+        }
+    }
+    println!("{}", count);
+    Ok(())
+}
