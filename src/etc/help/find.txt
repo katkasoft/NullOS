@@ -1,0 +1,14 @@
+find - search for files in directory
+
+Usage:
+    find [dir]
+    find [dir] [name]
+
+Recursively searches for files in the given directory.
+
+Without a name, prints all files found.
+With a name, prints only files whose name matches exactly.
+
+Examples:
+    find /etc
+    find /home rshrc
