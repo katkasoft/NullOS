@@ -1,0 +1,6 @@
+uname - print kernel version
+
+Usage:
+    uname
+
+Prints the kernel version from /proc/version.

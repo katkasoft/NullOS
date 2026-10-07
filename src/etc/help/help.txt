@@ -23,11 +23,13 @@ cp [file/dir] [destination] - Copy file or directory
 mv [file] [destination] - Move or rename file
 head [file] - Read first lines of file
 tail [file] - Read last lines of file
+wc [-l|-w|-c|-m] [file] - Count lines, words, bytes or chars
 
 System commands:
 sysmanager reboot/restart - Reboot system
 sysmanager shutdown/poweroff - Power off system
 sysmanager halt - Halt system
+uname - Print kernel version
 
 Process management:
 ps - List all processes and their stats

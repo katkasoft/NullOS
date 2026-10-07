@@ -1,0 +1,20 @@
+wc - count lines, words, bytes or characters
+
+Usage:
+    wc [-l|-w|-c|-m] [file]
+
+Counts something in the given file.
+
+Options:
+    -l  count lines
+    -w  count words (separated by whitespace)
+    -c  count bytes
+    -m  count characters
+
+Exactly one option must be given.
+
+Examples:
+    wc -l /etc/passwd
+    wc -w notes.txt
+    wc -c /bin/ls
+    wc -m text.txt
