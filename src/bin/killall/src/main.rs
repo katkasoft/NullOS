@@ -9,7 +9,7 @@ fn main() -> io::Result<()> {
             .map(|n| n.to_string_lossy().into_owned())
             .unwrap_or_else(|| args[0].clone());
         let filename = format!("/etc/help/{}.txt", name);
-        let contents = fs:read_to_string(&filename)?;
+        let contents = fs::read_to_string(&filename)?;
         println!("{}", contents);
         std::process::exit(0)
     }
