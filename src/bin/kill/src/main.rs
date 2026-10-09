@@ -1,5 +1,6 @@
-use std::{env, eprintln, io};
+use std::{env, io};
 use rustix::process::{kill_process, Pid, Signal};
+use std::fs;
 
 fn main() -> io::Result<()> {
     let args: Vec<String> = env::args().skip(1).collect();

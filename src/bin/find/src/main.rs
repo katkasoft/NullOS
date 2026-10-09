@@ -1,6 +1,7 @@
 use std::env;
 use std::io;
 use walkdir::WalkDir;
+use std::fs;
 
 fn main() -> io::Result<()> {
     let args: Vec<String> = env::args().skip(1).collect();

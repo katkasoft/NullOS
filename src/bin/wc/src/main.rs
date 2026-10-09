@@ -1,6 +1,7 @@
 use std::env;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Read};
+use std::fs;
 
 fn main() -> io::Result<()> {
     let args: Vec<String> = env::args().skip(1).collect();

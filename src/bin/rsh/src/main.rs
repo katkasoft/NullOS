@@ -11,6 +11,7 @@ use rustyline::hint::Hinter;
 use rustyline::validate::Validator;
 use rustyline::{Context, Helper, Result as RlResult};
 use std::collections::HashMap;
+use std::fs;
 
 struct RshHelper;
 

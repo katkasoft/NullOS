@@ -2,6 +2,7 @@ use std::{env, io, println};
 use std::path::Path;
 use std::fs::{File, FileTimes};
 use std::time::SystemTime;
+use std::fs;
 
 fn main() -> io::Result<()> {
     let args: Vec<String> = env::args().collect();
