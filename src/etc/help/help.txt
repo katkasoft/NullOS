@@ -31,6 +31,7 @@ sysmanager reboot/restart - Reboot system
 sysmanager shutdown/poweroff - Power off system
 sysmanager halt - Halt system
 uname - Print kernel version
+id - Print user and group identity
 
 Process management:
 ps - List all processes and their stats
