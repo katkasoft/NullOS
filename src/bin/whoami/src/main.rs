@@ -1,4 +1,4 @@
-use std::{fs, io};
+use std::{fs, io, env};
 use rustix::process::getuid;
 
 fn name_from_passwd(uid: u32) -> String {
