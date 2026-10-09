@@ -2,7 +2,7 @@ use std::io::{self, Write};
 use std::process;
 use std::fs;
 
-fn main() {
+fn main() -> io::Result<()> {
     let args: Vec<String> = std::env::args().collect();
     if args.len() >= 2 && args[1] == "--help" {
         let name = std::path::Path::new(&args[0])
@@ -50,4 +50,5 @@ fn main() {
             process::exit(1);
         }
     }
+    Ok(())
 }
