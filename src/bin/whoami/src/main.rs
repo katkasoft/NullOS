@@ -1,7 +1,8 @@
 use std::{fs, io};
-use rustix::process::{getuid, getgid};
+use rustix::process::getuid;
 
 fn name_from_passwd(uid: u32) -> String {
+    let args: Vec<String> = env::args().collect();
     if let Ok(contents) = fs::read_to_string("/etc/passwd") {
         for line in contents.lines() {
             let parts: Vec<&str> = line.split(':').collect();
