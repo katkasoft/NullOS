@@ -1,0 +1,11 @@
+tac - print file in reverse
+
+Usage:
+    tac [file]
+
+Prints the contents of the file with lines in reverse order.
+The last line becomes the first, and so on.
+
+Examples:
+    tac /etc/passwd
+    tac notes.txt

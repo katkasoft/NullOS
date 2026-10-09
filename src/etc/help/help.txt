@@ -15,6 +15,7 @@ File management:
 ls [dir] - List files and directories in directory
 touch [file] - Create file or update modified and accessed time
 cat [file] - Read contents of file
+tac [file] - Read contents of file, reversed by lines
 write [file] [contents] - Write to file
 rm [file/dir] - Remove file or directory
 mkdir [dir] - Create empty directory
