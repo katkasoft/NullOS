@@ -1,0 +1,11 @@
+id - print user and group identity
+
+Usage:
+    id
+
+Prints the current user ID (uid), group ID (gid) and groups.
+Names are taken from /etc/passwd and /etc/group.
+
+Example:
+    id
+    uid=0(root) gid=0(root) groups=0(root)
