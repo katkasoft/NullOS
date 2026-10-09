@@ -32,11 +32,13 @@ sysmanager reboot/restart - Reboot system
 sysmanager shutdown/poweroff - Power off system
 sysmanager halt - Halt system
 uname - Print kernel version
-id - Print user and group identity
 
 Process management:
 ps - List all processes and their stats
 kill -[signal] [pid] - Kill process by pid
 killall -[signal] [process] - Kill all processes by name
 
-To see manual for command type help [command]
+Other commands:
+id - Print user and group identity
+whoami - Print current user name
+help [command] - Display manual for command(s)

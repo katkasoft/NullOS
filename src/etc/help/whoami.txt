@@ -1,0 +1,7 @@
+whoami - print current user name
+
+Usage:
+    whoami
+
+Prints the name of the current user.
+The name is looked up in /etc/passwd by UID.
