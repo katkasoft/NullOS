@@ -14,7 +14,7 @@ fn main() -> std::io::Result<()> {
         println!("{}", contents);
         std::process::exit(0)
     }
-    let args = args.into_iter().skip(1).collect();
+    let args: Vec<String> = args.into_iter().skip(1).collect();
     let accepted_params= vec!["a".to_string(), "f".to_string()];
     let mut params: Vec<String> = vec![];
     let mut folders: Vec<String> = vec![];

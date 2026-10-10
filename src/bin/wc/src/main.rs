@@ -15,7 +15,7 @@ fn main() -> io::Result<()> {
         println!("{}", contents);
         std::process::exit(0)
     }
-    let args = args.into_iter().skip(1).collect();
+    let args: Vec<String> = args.into_iter().skip(1).collect();
     if args.len() != 2 {
         eprintln!("Usage: wc [-l|-w|-c|-m] [file]");
         std::process::exit(1);
