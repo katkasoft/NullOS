@@ -204,7 +204,7 @@ fn run_script(shell: &mut Shell, path: &str) -> io::Result<()> {
 }
 
 fn main() -> io::Result<()> {
-    let args: Vec<String> = env::args().skip(1).collect();
+    let args: Vec<String> = env::args().collect();
     if args.len() >= 2 && args[1] == "--help" {
         let name = std::path::Path::new(&args[0])
             .file_name()
@@ -215,6 +215,7 @@ fn main() -> io::Result<()> {
         println!("{}", contents);
         std::process::exit(0)
     }
+    let args = args.into_iter().skip(1).collect();
     if args.is_empty() {
         let mut shell = Shell::new();
         if Path::new("/etc/rshrc").exists() {

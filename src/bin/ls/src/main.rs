@@ -3,7 +3,7 @@ use std::path::Path;
 use std::fs;
 
 fn main() -> std::io::Result<()> {
-    let args: Vec<String> = env::args().skip(1).collect();
+    let args: Vec<String> = env::args().collect();
     if args.len() >= 2 && args[1] == "--help" {
         let name = std::path::Path::new(&args[0])
             .file_name()
@@ -14,6 +14,7 @@ fn main() -> std::io::Result<()> {
         println!("{}", contents);
         std::process::exit(0)
     }
+    let args = args.into_iter().skip(1).collect();
     let accepted_params= vec!["a".to_string(), "f".to_string()];
     let mut params: Vec<String> = vec![];
     let mut folders: Vec<String> = vec![];
