@@ -30,13 +30,29 @@ fn main() -> io::Result<()> {
         eprintln!("Usage: syscall [number] [args...]");
         std::process::exit(1);
     }
-    let num: c_long = args[0].parse().unwrap_or_else(|_| {
-        eprintln!("syscall: invalid number: {}", args[0]);
+    let accepted_params: Vec<String> = vec!["-q".to_string()];
+    let mut params: Vec<String> = vec![];
+    let mut syscall_args: Vec<String> = vec![];
+    for arg in args.iter() {
+        if arg.starts_with("-") {
+            for chr in arg.chars().skip(1) {
+                if accepted_params.contains(&chr.to_string()) {
+                    params.push(chr.to_string());
+                } else {
+                    eprintln!("No such parametre: {}", chr);
+                }
+            }
+        } else {
+            syscall_args.push(arg.clone());
+        }
+    }
+    let num: c_long = syscall_args[0].parse().unwrap_or_else(|_| {
+        eprintln!("syscall: invalid number: {}", syscall_args[0]);
         std::process::exit(1);
     });
     let mut values: Vec<c_long> = Vec::new();
     let mut strings: Vec<CString> = Vec::new();
-    for arg in &args[1..] {
+    for arg in &syscall_args[1..] {
         let (val, s) = parse_arg(arg);
         values.push(val);
         if let Some(s) = s {
@@ -62,7 +78,7 @@ fn main() -> io::Result<()> {
     if result < 0 && result >= -4095 {
         eprintln!("errno: {}", -result);
         std::process::exit(1);
-    } else {
+    } else if !params.contains(&"q".to_string()) {
         println!("{}", result);
     }
     Ok(())
