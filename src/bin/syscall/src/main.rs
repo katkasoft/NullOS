@@ -1,5 +1,17 @@
 use std::{env, fs, io};
+use std::ffi::CString;
 use libc::{syscall, c_long};
+
+fn parse_arg(arg: &str) -> (c_long, Option<CString>) {
+    if arg.starts_with('"') && arg.ends_with('"') && arg.len() >= 2 {
+        let inner = &arg[1..arg.len() - 1];
+        let processed = inner.replace("\\n", "\n");
+        let cstr = CString::new(processed).unwrap();
+        (cstr.as_ptr() as c_long, Some(cstr))
+    } else {
+        (arg.parse::<c_long>().unwrap_or(0), None)
+    }
+}
 
 fn main() -> io::Result<()> {
     let raw_args: Vec<String> = env::args().collect();
@@ -22,24 +34,36 @@ fn main() -> io::Result<()> {
         eprintln!("syscall: invalid number: {}", args[0]);
         std::process::exit(1);
     });
-    let call_args: Vec<c_long> = args[1..].iter()
-        .map(|s| s.parse::<c_long>().unwrap_or(0))
-        .collect();
+    let mut values: Vec<c_long> = Vec::new();
+    let mut strings: Vec<CString> = Vec::new();
+    for arg in &args[1..] {
+        let (val, s) = parse_arg(arg);
+        values.push(val);
+        if let Some(s) = s {
+            strings.push(s);
+        }
+    }
     let result = unsafe {
-        match call_args.len() {
+        match values.len() {
             0 => syscall(num),
-            1 => syscall(num, call_args[0]),
-            2 => syscall(num, call_args[0], call_args[1]),
-            3 => syscall(num, call_args[0], call_args[1], call_args[2]),
-            4 => syscall(num, call_args[0], call_args[1], call_args[2], call_args[3]),
-            5 => syscall(num, call_args[0], call_args[1], call_args[2], call_args[3], call_args[4]),
-            6 => syscall(num, call_args[0], call_args[1], call_args[2], call_args[3], call_args[4], call_args[5]),
+            1 => syscall(num, values[0]),
+            2 => syscall(num, values[0], values[1]),
+            3 => syscall(num, values[0], values[1], values[2]),
+            4 => syscall(num, values[0], values[1], values[2], values[3]),
+            5 => syscall(num, values[0], values[1], values[2], values[3], values[4]),
+            6 => syscall(num, values[0], values[1], values[2], values[3], values[4], values[5]),
             _ => {
-                eprintln!("syscall: too many arguments (max 6)");
+                eprintln!("syscall: too many arguments");
                 std::process::exit(1);
             }
         }
     };
-    println!("{}", result);
+    drop(strings);
+    if result < 0 && result >= -4095 {
+        eprintln!("errno: {}", -result);
+        std::process::exit(1);
+    } else {
+        println!("{}", result);
+    }
     Ok(())
 }
