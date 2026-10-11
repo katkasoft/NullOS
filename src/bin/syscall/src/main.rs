@@ -30,7 +30,7 @@ fn main() -> io::Result<()> {
         eprintln!("Usage: syscall [number] [args...]");
         std::process::exit(1);
     }
-    let accepted_params: Vec<String> = vec!["-q".to_string()];
+    let accepted_params: Vec<String> = vec!["q".to_string()];
     let mut params: Vec<String> = vec![];
     let mut syscall_args: Vec<String> = vec![];
     for arg in args.iter() {
