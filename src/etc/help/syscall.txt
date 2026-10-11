@@ -1,0 +1,22 @@
+syscall - invoke a kernel system call
+
+Usage:
+    syscall [number] [args...]
+    syscall -q [number] [args...]
+
+Calls the Linux system call with the given number and up to 6 arguments.
+Arguments can be integers or double-quoted strings.
+
+Options:
+    -q    do not print the return value on success
+
+On success, prints the return value to stdout (unless -q) and exits 0.
+On failure, prints errno to stderr and exits 1.
+
+Examples:
+    syscall 39                    # getpid
+    syscall 102                   # getuid
+    syscall 1 1 "hello\n" 6       # write(1, "hello\n", 6)
+    syscall -q 39                 # getpid, no output
+
+Warning: some syscalls can crash or kill your shell.
