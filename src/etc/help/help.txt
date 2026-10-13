@@ -26,6 +26,7 @@ head [file] - Read first lines of file
 tail [file] - Read last lines of file
 wc [-l|-w|-c|-m] [file] - Count lines, words, bytes or chars
 find [dir] [name] - Search for files in directory
+nl [file] - Number lines of file
 
 System commands:
 sysmanager reboot/restart - Reboot system

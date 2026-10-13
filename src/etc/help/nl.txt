@@ -1,0 +1,11 @@
+nl - number lines of a file
+
+Usage:
+    nl [file]
+
+Prints the file with line numbers.
+Numbers are right-aligned to 6 characters.
+
+Examples:
+    nl /etc/passwd
+    nl notes.txt
