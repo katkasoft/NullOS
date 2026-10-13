@@ -1,0 +1,6 @@
+hostname - print system hostname
+
+Usage:
+    hostname
+
+Prints the hostname from /etc/hostname.

@@ -28,7 +28,7 @@ wc [-l|-w|-c|-m] [file] - Count lines, words, bytes or chars
 find [dir] [name] - Search for files in directory
 nl [file] - Number lines of file
 
-System commands:
+System (kernel) commands:
 sysmanager reboot/restart - Reboot system
 sysmanager shutdown/poweroff - Power off system
 sysmanager halt - Halt system
@@ -44,5 +44,6 @@ killall -[signal] [process] - Kill all processes by name
 Other commands:
 id - Print user and group identity
 whoami - Print current user name
+hostname - Print system hostname
 sleep [seconds] - Pause for given number of seconds
 help [command] - Display manual for command(s)
