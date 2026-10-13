@@ -35,6 +35,7 @@ sysmanager halt - Halt system
 uname - Print kernel version
 syscall [number] [args...] - Invoke kernel syscall directly
 sync - Flush filesystem buffers to disk
+uptime - Show how long the system has been running
 
 Process management:
 ps - List all processes and their stats

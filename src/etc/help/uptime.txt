@@ -1,0 +1,12 @@
+uptime - show how long the system has been running
+
+Usage:
+    uptime
+
+Prints the time since the system booted, read from /proc/uptime.
+
+Examples:
+    up 45s
+    up 3m 15s
+    up 2h 30m 10s
+    up 1d 5h 20m 3s
