@@ -42,4 +42,5 @@ killall -[signal] [process] - Kill all processes by name
 Other commands:
 id - Print user and group identity
 whoami - Print current user name
+sleep [seconds] - Pause for given number of seconds
 help [command] - Display manual for command(s)

@@ -1,0 +1,10 @@
+sleep - pause for a given number of seconds
+
+Usage:
+    sleep [seconds]
+
+Pauses execution for the given number of seconds.
+
+Example:
+    sleep 5
+    sleep 3600
