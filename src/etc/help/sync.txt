@@ -1,0 +1,7 @@
+sync - flush filesystem buffers to disk
+
+Usage:
+    sync
+
+Writes all buffered filesystem data to disk.
+Useful before shutdown or reboot to ensure data is saved.

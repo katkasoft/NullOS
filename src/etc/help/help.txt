@@ -33,6 +33,7 @@ sysmanager shutdown/poweroff - Power off system
 sysmanager halt - Halt system
 uname - Print kernel version
 syscall [number] [args...] - Invoke kernel syscall directly
+sync - Flush filesystem buffers to disk
 
 Process management:
 ps - List all processes and their stats
