@@ -1,0 +1,9 @@
+date - print current date and time
+
+Usage:
+    date
+
+Prints the current local date and time in ISO 8601 format.
+
+Example:
+    2026-10-15 14:23:45
