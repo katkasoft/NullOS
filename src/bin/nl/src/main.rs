@@ -28,9 +28,9 @@ fn main() -> io::Result<()> {
         }
         let file = File::open(arg)?;
         let reader = BufReader::new(file);
-        let count = 1;
+        let mut count = 1;
         for line in reader.lines() {
-            let mut line = line?;
+            let line = line?;
             println!("{:6} {}", count, line);
             count += 1;
         }
