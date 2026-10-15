@@ -16,24 +16,28 @@ fn main() -> io::Result<()> {
     }
     let file = File::open("/proc/meminfo")?;
     let reader = BufReader::new(file);
+    let mut memtotal: u64 = 0;
+    let mut memavailable: u64 = 0;
     for line in reader.lines() {
         let line = line?;
         if line.starts_with("MemTotal:") {
             let second_word = line.split_whitespace().nth(1).unwrap();
             let memtotal_kb: u64 = second_word.parse().unwrap();
-            let memtotal = memtotal_kb / 1024;
-            println!("MemTotal: {} mb", memtotal);
+            memtotal = memtotal_kb / 1024;
+            println!("MemTotal:     {} MB", memtotal);
         } else if line.starts_with("MemFree:") {
             let second_word = line.split_whitespace().nth(1).unwrap();
             let memfree_kb: u64 = second_word.parse().unwrap();
             let memfree = memfree_kb / 1024;
-            println!("MemFree: {} mb", memfree);
+            println!("MemFree:      {} MB", memfree);
         } else if line.starts_with("MemAvailable:") {
             let second_word = line.split_whitespace().nth(1).unwrap();
             let memavailable_kb: u64 = second_word.parse().unwrap();
-            let memavailable = memavailable_kb / 1024;
-            println!("MemAvailable: {} mb", memavailable);
+            memavailable = memavailable_kb / 1024;
+            println!("MemAvailable: {} MB", memavailable);
         }
     }
+    let used = memtotal.saturating_sub(memavailable);
+    println!("Used:         {} MB", used);
     Ok(())
 }
