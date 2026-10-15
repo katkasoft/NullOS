@@ -1,0 +1,12 @@
+free - display memory usage
+
+Usage:
+    free
+
+Displays memory information in megabytes.
+Data is read from /proc/meminfo.
+
+Fields:
+    MemTotal     - total usable RAM
+    MemFree      - unused RAM
+    MemAvailable - RAM available for new applications

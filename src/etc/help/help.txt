@@ -47,5 +47,6 @@ id - Print user and group identity
 whoami - Print current user name
 hostname - Print system hostname
 date - Print current date and time
+free - Display memory usage
 sleep [seconds] - Pause for given number of seconds
 help [command] - Display manual for command(s)
