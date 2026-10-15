@@ -41,12 +41,13 @@ Process management:
 ps - List all processes and their stats
 kill -[signal] [pid] - Kill process by pid
 killall -[signal] [process] - Kill all processes by name
+free - Display memory usage
 
 Other commands:
 id - Print user and group identity
 whoami - Print current user name
 hostname - Print system hostname
 date - Print current date and time
-free - Display memory usage
+which [command] - Locate a command in PATH
 sleep [seconds] - Pause for given number of seconds
 help [command] - Display manual for command(s)

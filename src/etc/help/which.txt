@@ -1,0 +1,11 @@
+which - locate a command
+
+Usage:
+    which [command]
+
+Searches for the given command in the directories listed in PATH.
+Prints the full path of the first match.
+
+Example:
+    which ls
+    /bin/ls

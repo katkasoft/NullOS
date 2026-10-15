@@ -10,3 +10,4 @@ Fields:
     MemTotal     - total usable RAM
     MemFree      - unused RAM
     MemAvailable - RAM available for new applications
+    Used         - used RAM
