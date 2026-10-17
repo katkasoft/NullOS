@@ -27,6 +27,7 @@ tail [file] - Read last lines of file
 wc [-l|-w|-c|-m] [file] - Count lines, words, bytes or chars
 find [dir] [name] - Search for files in directory
 nl [file] - Number lines of file
+sort [file] - Sort lines of text file
 
 System (kernel) commands:
 sysmanager reboot/restart - Reboot system

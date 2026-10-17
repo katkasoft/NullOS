@@ -1,0 +1,15 @@
+sort - sort lines of text files
+
+Usage:
+    sort [file]
+    sort -r [file]
+
+Sorts the lines in the given file alphabetically.
+Case-insensitive (ignores upper/lowercase).
+
+Options:
+    -r    reverse the result of comparisons
+
+Examples:
+    sort /etc/passwd
+    sort -r notes.txt
