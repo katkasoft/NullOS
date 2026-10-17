@@ -28,6 +28,7 @@ wc [-l|-w|-c|-m] [file] - Count lines, words, bytes or chars
 find [dir] [name] - Search for files in directory
 nl [file] - Number lines of file
 sort [file] - Sort lines of text file
+uniq [file] - Remove consecutive duplicate lines
 
 System (kernel) commands:
 sysmanager reboot/restart - Reboot system

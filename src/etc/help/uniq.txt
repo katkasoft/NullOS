@@ -1,0 +1,10 @@
+uniq - report or omit repeated lines
+
+Usage:
+    uniq [file]
+
+Filters adjacent matching lines from the given file.
+Only removes lines that are repeated consecutively.
+
+Example:
+    uniq notes.txt
