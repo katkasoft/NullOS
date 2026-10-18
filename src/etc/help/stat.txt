@@ -1,0 +1,11 @@
+stat - display file or file system status
+
+Usage:
+    stat [file/dir]
+
+Displays detailed information about a file or directory:
+size, type, permissions and last modification time.
+
+Example:
+    stat /etc/passwd
+    stat /bin
