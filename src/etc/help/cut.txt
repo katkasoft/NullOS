@@ -1,0 +1,12 @@
+cut - remove sections from each line of files
+
+Usage:
+    cut [delimiter] [field] [file]
+
+Prints the specified field from each line of the file.
+Fields are separated by the given delimiter.
+Field numbering starts from 1.
+
+Examples:
+    cut : 1 /etc/passwd
+    cut , 2 data.csv
