@@ -43,8 +43,8 @@ fn main() -> io::Result<()> {
             files.push(arg.clone());
         }
     }
-    let dir: String = match args.len() {
-        1 => ".".to_string(),
+    let dir: String = match files.len() {
+        0 => ".".to_string(),
         _ => files[0].clone()
     };
     let path = Path::new(&dir);
