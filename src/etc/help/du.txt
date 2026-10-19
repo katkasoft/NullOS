@@ -1,0 +1,16 @@
+du - estimate file space usage
+
+Usage:
+    du [dir]
+    du -s [dir]
+
+Summarizes disk usage of the given directory.
+By default, prints the size of every file and the total size at the end.
+With -s, prints only the total size.
+
+Options:
+    -s    display only a total for each argument
+
+Examples:
+    du /etc
+    du -s /bin

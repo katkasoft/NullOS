@@ -30,6 +30,7 @@ nl [file] - Number lines of file
 sort [file] - Sort lines of text file
 uniq [file] - Remove consecutive duplicate lines
 stat [file/dir] - Display detailed file or directory information
+du [dir] - Estimate file space usage
 
 System (kernel) commands:
 sysmanager reboot/restart - Reboot system
