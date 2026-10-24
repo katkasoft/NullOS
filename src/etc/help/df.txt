@@ -1,0 +1,14 @@
+df - report file system disk space usage
+
+Usage:
+    df
+
+Shows the amount of disk space used and available on all mounted filesystems.
+
+Columns:
+    Filesystem  - Name of the filesystem
+    Size        - Total size
+    Used        - Space used
+    Avail       - Space available
+    Use%        - Percentage of space used
+    Mounted on  - Mount point

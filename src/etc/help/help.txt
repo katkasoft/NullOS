@@ -32,6 +32,7 @@ uniq [file] - Remove consecutive duplicate lines
 stat [file/dir] - Display detailed file or directory information
 du [dir] - Estimate file space usage
 cut [delimiter] [field] [file] - Remove sections from each line of files
+df - Report file system disk space usage
 
 System (kernel) commands:
 sysmanager reboot/restart - Reboot system
