@@ -161,6 +161,15 @@ fn builtin_echo(args: &[String]) {
     println!();
 }
 
+fn builtin_history() {
+    if let Ok(home) = env::var("HOME") {
+        let history_path = format!("{}/.rsh_history", home);
+        if let Ok(contents) = fs::read_to_string(history_path) {
+            print!("{}", contents);
+        }
+    }
+}
+
 fn run_line(shell: &mut Shell, input: &str) {
     let input = input.trim();
     if input.is_empty() || input.starts_with('#') {
@@ -188,6 +197,7 @@ fn run_line(shell: &mut Shell, input: &str) {
         "env" => builtin_env(shell),
         "export" => builtin_export(shell, &args),
         "unset" => builtin_unset(shell, &args),
+        "history" => builtin_history(),
         "exit" => std::process::exit(0),
         _ => run_command(shell, cmd, &args),
     }
@@ -229,15 +239,23 @@ fn main() -> io::Result<()> {
         }
         let mut rl: Editor<RshHelper, DefaultHistory> = Editor::new().unwrap();
         rl.set_helper(Some(RshHelper));
+        if let Ok(home) = env::var("HOME") {
+            let history_path = format!("{}/.rsh_history", home);
+            let _ = rl.load_history(&history_path);
+        }
         loop {
             let prompt = match env::current_dir() {
                 Ok(path) => format!("{}$ ", path.display()),
                 Err(_) => "$ ".to_string(),
             };
             match rl.readline(&prompt) {
-                Ok(input) => {
+                    Ok(input) => {
                     let _ = rl.add_history_entry(input.as_str());
                     run_line(&mut shell, &input);
+                    if let Ok(home) = env::var("HOME") {
+                        let history_path = format!("{}/.rsh_history", home);
+                        let _ = rl.save_history(&history_path);
+                    }
                 }
                 Err(_) => break,
             }

@@ -28,6 +28,7 @@ Built-in commands:
     export [VAR=val] - set environment variable
     unset [VAR]      - remove environment variable
     env              - print all environment variables
+    history     - display command history
     exit             - exit the shell
 
 Environment:
@@ -35,5 +36,7 @@ Environment:
     Use export VAR=value to set, unset VAR to remove, env to list all.
     $VAR in command arguments is replaced with the variable value.
     External commands are searched using the PATH variable.
+
+History is saved to $HOME/.rsh_history and persists between sessions.
 
 External commands are searched in /bin, /sbin and /usr/bin.

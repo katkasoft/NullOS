@@ -9,6 +9,7 @@ clear - Clear screen
 export [VAR=value] - Set environment variable
 unset [VAR] - Remove environment variable
 env - Print all environment variables
+history - Display command history
 exit - Exit shell
 
 File management:
