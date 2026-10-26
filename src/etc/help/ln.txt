@@ -1,0 +1,11 @@
+ln - create a symbolic link
+
+Usage:
+    ln [target] [link]
+
+Creates a symbolic link named [link] pointing to [target].
+If [link] already exists, the command will fail.
+
+Examples:
+    ln /bin/rsh /bin/sh
+    ln /etc/passwd my_passwd_link
