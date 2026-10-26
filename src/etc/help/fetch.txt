@@ -1,0 +1,22 @@
+fetch - display system information
+
+Usage:
+    fetch
+    fetch [options]
+
+Without arguments, prints a summary of the system.
+With options, prints only the requested information.
+
+Options:
+    -s    Print OS name
+    -h    Print hostname
+    -k    Print kernel version
+    -u    Print system uptime
+    -c    Print CPU model
+    -m    Print memory usage
+    -d    Print disk usage for root
+
+Examples:
+    fetch
+    fetch -c
+    fetch -m -d

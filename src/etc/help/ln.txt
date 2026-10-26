@@ -8,4 +8,4 @@ If [link] already exists, the command will fail.
 
 Examples:
     ln /bin/rsh /bin/sh
-    ln /etc/passwd my_passwd_link
+    ln /etc/passwd my_passwd_link   

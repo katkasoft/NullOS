@@ -43,6 +43,7 @@ uname - Print kernel version
 syscall [number] [args...] - Invoke kernel syscall directly
 sync - Flush filesystem buffers to disk
 uptime - Show how long the system has been running
+fetch [options] - Display system information
 
 Process management:
 ps - List all processes and their stats
