@@ -181,6 +181,16 @@ fn run_line(shell: &mut Shell, input: &str) {
         None => return,
     };
     let args: Vec<String> = parts.map(|s| {
+        if s == "~" || s.starts_with("~/") {
+            if let Some(home) = shell.vars.get("HOME") {
+                if s == "~" {
+                    return home.clone();
+                } else {
+                    let rest = &s[1..];
+                    return format!("{}{}", home, rest);
+                }
+            }
+        }
         if let Some(key) = s.strip_prefix('$') {
             if let Some(value) = shell.vars.get(key) {
                 return value.clone();

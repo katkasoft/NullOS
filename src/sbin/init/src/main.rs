@@ -34,6 +34,7 @@ fn main() {
     println!("Starting shell...");
     let shell = CString::new("/bin/rsh").unwrap();
     let args = [shell.as_ptr(), ptr::null()];
+    std::env::set_var("HOME", "/root");
     unsafe {
         execv(shell.as_ptr(), args.as_ptr());
     }
