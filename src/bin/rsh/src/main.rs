@@ -164,8 +164,16 @@ fn builtin_echo(args: &[String]) {
 fn builtin_history() {
     if let Ok(home) = env::var("HOME") {
         let history_path = format!("{}/.rsh_history", home);
-        if let Ok(contents) = fs::read_to_string(history_path) {
-            print!("{}", contents);
+        if let Ok(file) = File::open(history_path) {
+            let reader = BufReader::new(file);
+            for line in reader.lines() {
+                if let Ok(line) = line {
+                    if line.starts_with("#") {
+                        continue
+                    }
+                    println!("{}", line)
+                }
+            }
         }
     }
 }
