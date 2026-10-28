@@ -31,8 +31,8 @@ fn main() {
     mount_fs("sysfs", "/sys", "sysfs", 0);
     mount_fs("devtmpfs", "/dev", "devtmpfs", 0);
     mount_fs("tmpfs", "/run", "tmpfs", 0);
-    println!("Starting shell...");
-    let shell = CString::new("/bin/rsh").unwrap();
+    println!("Starting menu...");
+    let shell = CString::new("/bin/menu").unwrap();
     let args = [shell.as_ptr(), ptr::null()];
     std::env::set_var("HOME", "/root");
     unsafe {

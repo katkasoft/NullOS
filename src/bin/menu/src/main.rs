@@ -5,6 +5,7 @@ use crossterm::terminal::{enable_raw_mode, disable_raw_mode};
 use crossterm::event::{self, Event, KeyCode};
 use crossterm::execute;
 use crossterm::cursor::MoveTo;
+use crossterm::style::Stylize;
 
 struct MenuItem {
     label: String,
@@ -51,7 +52,7 @@ fn main() -> io::Result<()> {
         print!("\r\n");
         for (index, item) in items.iter().enumerate() {
             if index == selected {
-                print!("> {}. {}\r\n", index, item.label);
+                print!("{}\r\n", format!("> {}. {}", index, item.label).red().bold());
             } else {
                 print!("  {}. {}\r\n", index, item.label);
             }
