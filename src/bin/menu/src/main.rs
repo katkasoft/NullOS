@@ -85,7 +85,14 @@ fn main() -> io::Result<()> {
                     if let Some(cmd) = parts.next() {
                         let args: Vec<&str> = parts.collect();
                         match std::process::Command::new(cmd).args(&args).status() {
-                            Ok(_) => {},
+                            Ok(_) => {
+                                if !action.contains("/rsh") && !action.contains("/menu") {
+                                    print!("\r\nPress Enter to return to menu...");
+                                    std::io::stdout().flush()?;
+                                    let mut dummy = String::new();
+                                    let _ = std::io::stdin().read_line(&mut dummy);
+                                }
+                            },
                             Err(e) => {
                                 eprintln!("Failed to run {}: {}", cmd, e);
                                 let _ = std::io::stdin().read_line(&mut String::new());
