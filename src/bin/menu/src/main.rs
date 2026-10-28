@@ -70,6 +70,12 @@ fn main() -> io::Result<()> {
                         selected += 1;
                     }
                 },
+                KeyCode::Char(c) if c.is_ascii_digit() => {
+                    let target_index = (c as u8 - b'0') as usize;
+                    if target_index < items.len() {
+                        selected = target_index;
+                    }
+                },
                 KeyCode::Enter => {
                     let action = &items[selected].action;
                     disable_raw_mode()?;
@@ -79,7 +85,7 @@ fn main() -> io::Result<()> {
                     if let Some(cmd) = parts.next() {
                         let args: Vec<&str> = parts.collect();
                         match std::process::Command::new(cmd).args(&args).status() {
-                            Ok(_) => {}, // Программа завершилась нормально (или сама упала)
+                            Ok(_) => {},
                             Err(e) => {
                                 eprintln!("Failed to run {}: {}", cmd, e);
                                 let _ = std::io::stdin().read_line(&mut String::new());
