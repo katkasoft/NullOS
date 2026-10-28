@@ -10,6 +10,7 @@ use crossterm::style::Stylize;
 struct MenuItem {
     label: String,
     action: String,
+    pause: bool,
 }
 
 fn main() -> io::Result<()> {
@@ -34,14 +35,19 @@ fn main() -> io::Result<()> {
     let mut items: Vec<MenuItem> = Vec::new();
     for line in reader.lines() {
         let line = line?;
-        if !line.trim().is_empty() && !line.trim().starts_with("#") {
-            if let Some((label, action)) = line.split_once(":") {
-                let item = MenuItem {
-                    label: label.trim().to_string(),
-                    action:action.trim().to_string()
-                };
-                items.push(item);
-            } 
+        let trimmed = line.trim();
+        if !trimmed.is_empty() && !trimmed.starts_with("#") {
+            let parts: Vec<&str> = trimmed.splitn(3, ':').collect();
+            if parts.len() >= 2 {
+                let label = parts[0].trim().to_string();
+                let action = parts[1].trim().to_string();
+                let pause = parts.len() == 3 && parts[2].trim() == "pause";
+                items.push(MenuItem {
+                    label,
+                    action,
+                    pause,
+                });
+            }
         }
     }
     enable_raw_mode()?;
@@ -86,7 +92,7 @@ fn main() -> io::Result<()> {
                         let args: Vec<&str> = parts.collect();
                         match std::process::Command::new(cmd).args(&args).status() {
                             Ok(_) => {
-                                if !action.contains("/rsh") && !action.contains("/menu") {
+                                if items[selected].pause {
                                     print!("\r\nPress Enter to return to menu...");
                                     std::io::stdout().flush()?;
                                     let mut dummy = String::new();
