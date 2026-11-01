@@ -6,6 +6,7 @@ use crossterm::event::{self, Event, KeyCode};
 use crossterm::execute;
 use crossterm::cursor::MoveTo;
 use crossterm::style::Stylize;
+use crossterm::terminal;
 
 struct MenuItem {
     label: String,
