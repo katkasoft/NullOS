@@ -52,11 +52,22 @@ fn main() -> io::Result<()> {
     }
     enable_raw_mode()?;
     let mut selected: usize = 0;
+    let mut offset: usize = 0;
     loop {
+        let (width, height) = terminal::size()?;
+        let max_visible_items = height.saturating_sub(2) as usize;
         execute!(std::io::stdout(), crossterm::terminal::Clear(crossterm::terminal::ClearType::All), MoveTo(0, 0))?; 
         print!("=== NullOS Menu ===\r\n");
         print!("\r\n");
-        for (index, item) in items.iter().enumerate() {
+        if selected < offset {
+            offset = selected;
+        }
+        if selected >= offset + max_visible_items {
+            offset = selected - max_visible_items + 1;
+        }
+        let end = (offset + max_visible_items).min(items.len());
+        for index in offset..end {
+            let item = &items[index];
             if index == selected {
                 print!("{}\r\n", format!("> {}. {}", index, item.label).red().bold());
             } else {
@@ -72,7 +83,7 @@ fn main() -> io::Result<()> {
                     }
                 },
                 KeyCode::Down => {
-                    if selected < items.len() - 1 {
+                    if !items.is_empty() && selected < items.len() - 1 {
                         selected += 1;
                     }
                 },
@@ -83,6 +94,7 @@ fn main() -> io::Result<()> {
                     }
                 },
                 KeyCode::Enter => {
+                    if items.is_empty() { continue; }
                     let action = &items[selected].action;
                     disable_raw_mode()?;
                     execute!(std::io::stdout(), crossterm::terminal::Clear(crossterm::terminal::ClearType::All), MoveTo(0, 0))?;
