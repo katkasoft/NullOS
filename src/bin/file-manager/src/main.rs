@@ -56,7 +56,7 @@ fn input(prompt: &str) -> io::Result<String> {
     let mut input = String::new();
     io::stdin().read_line(&mut input)?;
     enable_raw_mode()?;
-Ok(input.trim().to_string()) 
+    Ok(input.trim().to_string()) 
 }
 
 fn main() -> io::Result<()> {

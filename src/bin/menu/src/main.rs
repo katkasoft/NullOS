@@ -55,7 +55,7 @@ fn main() -> io::Result<()> {
     let mut selected: usize = 0;
     let mut offset: usize = 0;
     loop {
-        let (width, height) = terminal::size()?;
+        let (_width, height) = terminal::size()?;
         let max_visible_items = height.saturating_sub(2) as usize;
         execute!(std::io::stdout(), crossterm::terminal::Clear(crossterm::terminal::ClearType::All), MoveTo(0, 0))?; 
         print!("=== NullOS Menu ===\r\n");
