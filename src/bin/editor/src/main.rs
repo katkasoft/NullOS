@@ -190,6 +190,14 @@ fn main() -> io::Result<()>{
                             lines[cursor_y].push_str(&current_line);
                         }
                     }
+                    KeyCode::Delete => {
+                        if cursor_x < lines[cursor_y].len() {
+                            lines[cursor_y].remove(cursor_x);
+                        } else if cursor_x == lines[cursor_y].len() && cursor_y + 1 < lines.len() {
+                            let next_line = lines.remove(cursor_y + 1);
+                            lines[cursor_y].push_str(&next_line);
+                        }
+                    }
                     KeyCode::Enter => {
                         let right_part = lines[cursor_y].split_off(cursor_x);
                         lines.insert(cursor_y + 1, right_part);
