@@ -50,6 +50,7 @@ fn main() -> io::Result<()>{
     let mut cursor_x: usize = 0;
     let mut cursor_y: usize = 0;
     let mut offset: usize = 0;
+    let mut pending_quit = false;
     loop {
         let (width, height) = terminal::size()?;
         let max_visible_items = height.saturating_sub(2) as usize;
@@ -69,7 +70,6 @@ fn main() -> io::Result<()>{
         let end = (offset + max_visible_items).min(lines.len());
         for y in offset..end {
             let line = &lines[y];
-            
             if y == cursor_y {
                 let left = &line[..cursor_x.min(line.len())];
                 let right = &line[cursor_x.min(line.len())..];
@@ -77,14 +77,18 @@ fn main() -> io::Result<()>{
                     let rest = &right[char_under_cursor.len_utf8()..];
                     print!("{}{}{}\r\n", left, char_under_cursor.to_string().black().on_white().bold(), rest);
                 } else {
-                    print!("{} \r\n", left);
+                    print!("{}{}\r\n", left, " ".to_string().black().on_white().bold());
                 }
             } else {
                 print!("{}\r\n", line);
             }
         }
         execute!(std::io::stdout(), MoveTo(0, height - 1))?;
-        let footer_text =  " [^o] Open [^s] Save [^q] Quit".to_string();
+        let footer_text= if pending_quit {
+            "Quit? [y/N]".to_string()
+        } else {
+            " [^o] Open [^s] Save [^q] Quit".to_string()
+        };
         let padded_footer = format!("{:<width$}", footer_text, width = width as usize);
         print!("{}", padded_footer.black().on_white().bold());
         std::io::stdout().flush()?;
@@ -92,7 +96,7 @@ fn main() -> io::Result<()>{
             if key_event.modifiers.contains(crossterm::event::KeyModifiers::CONTROL) {
                 match key_event.code {
                     KeyCode::Char('q') => {
-                        break;
+                        pending_quit = true;
                     },
                     KeyCode::Char('o') => {
                         let name = input("Enter filename: ")?;
@@ -174,6 +178,14 @@ fn main() -> io::Result<()>{
                         }
                     },
                     KeyCode::Char(c) => {
+                        if pending_quit {
+                            if c == 'y' || c == 'Y' {
+                                std::process::exit(0)
+                            } else {
+                                pending_quit = false;
+                                continue;
+                            }
+                        }
                         if cursor_x < (width as usize).saturating_sub(1) {
                             lines[cursor_y].insert(cursor_x, c);
                             cursor_x += 1;
