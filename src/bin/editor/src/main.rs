@@ -51,13 +51,26 @@ fn main() -> io::Result<()>{
     let mut cursor_y: usize = 0;
     let mut offset: usize = 0;
     let mut pending_quit = false;
+    let mut is_modified = false;
     loop {
         let (width, height) = terminal::size()?;
         let max_visible_items = height.saturating_sub(2) as usize;
         execute!(std::io::stdout(), crossterm::terminal::Clear(crossterm::terminal::ClearType::All), MoveTo(0, 0))?;
         let header_text: String = match filename {
-            Some(ref path) => format!(" NullOS text editor - {}", path),
-            None => " NullOS text editor".to_string(),
+            Some(ref path) => {
+                if is_modified {
+                    format!(" NullOS text editor - {} [Modified]", path)
+                } else {
+                    format!(" NullOS text editor - {}", path)
+                }
+            },
+            None => {
+                if is_modified {
+                    " NullOS text editor [Modified]".to_string()
+                } else {
+                    " NullOS text editor".to_string()
+                }
+            }
         };
         let padded_header = format!("{:<width$}", header_text, width = width as usize);
         print!("{}\r\n", padded_header.black().on_white().bold());
@@ -96,7 +109,11 @@ fn main() -> io::Result<()>{
             if key_event.modifiers.contains(crossterm::event::KeyModifiers::CONTROL) {
                 match key_event.code {
                     KeyCode::Char('q') => {
-                        pending_quit = true;
+                        if is_modified {
+                            pending_quit = true;
+                        } else {
+                            break;
+                        }
                     },
                     KeyCode::Char('o') => {
                         let name = input("Enter filename: ")?;
@@ -113,6 +130,7 @@ fn main() -> io::Result<()>{
                                 cursor_x = 0;
                                 cursor_y = 0;
                                 offset = 0;
+                                is_modified = false;
                             }
                         }
                     }
@@ -132,6 +150,7 @@ fn main() -> io::Result<()>{
                                     let _ = writeln!(writer, "{}", line);
                                 }
                                 let _ = writer.flush();
+                                is_modified = false;
                             }
                         }
                     }
@@ -190,6 +209,7 @@ fn main() -> io::Result<()>{
                             lines[cursor_y].insert(cursor_x, c);
                             cursor_x += 1;
                         }
+                        is_modified = true;
                     },
                     KeyCode::Backspace => {
                         if cursor_x > 0 {
@@ -201,6 +221,7 @@ fn main() -> io::Result<()>{
                             cursor_x = lines[cursor_y].len();
                             lines[cursor_y].push_str(&current_line);
                         }
+                        is_modified = true;
                     }
                     KeyCode::Delete => {
                         if cursor_x < lines[cursor_y].len() {
@@ -209,12 +230,14 @@ fn main() -> io::Result<()>{
                             let next_line = lines.remove(cursor_y + 1);
                             lines[cursor_y].push_str(&next_line);
                         }
+                        is_modified = true;
                     }
                     KeyCode::Enter => {
                         let right_part = lines[cursor_y].split_off(cursor_x);
                         lines.insert(cursor_y + 1, right_part);
                         cursor_y += 1;
                         cursor_x = 0;
+                        is_modified = true;
                     }
                     KeyCode::Esc => {
                         break;
