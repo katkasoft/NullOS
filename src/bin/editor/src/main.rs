@@ -50,6 +50,7 @@ fn main() -> io::Result<()>{
     let mut cursor_x: usize = 0;
     let mut cursor_y: usize = 0;
     let mut offset: usize = 0;
+    let mut offset_x: usize = 0;
     let mut pending_quit = false;
     let mut is_modified = false;
     loop {
@@ -81,11 +82,20 @@ fn main() -> io::Result<()>{
             offset = cursor_y - max_visible_items + 1;
         }
         let end = (offset + max_visible_items).min(lines.len());
+        let max_text_width = (width as usize).saturating_sub(1);
+        if cursor_x < offset_x {
+            offset_x = cursor_x;
+        }
+        if cursor_x >= offset_x + max_text_width {
+            offset_x = cursor_x - max_text_width + 1;
+        }
         for y in offset..end {
             let line = &lines[y];
+            let visible_line: String = line.chars().skip(offset_x).collect();
             if y == cursor_y {
-                let left = &line[..cursor_x.min(line.len())];
-                let right = &line[cursor_x.min(line.len())..];
+                let screen_cursor_x = cursor_x.saturating_sub(offset_x);
+                let left = &visible_line[..screen_cursor_x.min(visible_line.len())];
+                let right = &visible_line[screen_cursor_x.min(visible_line.len())..];
                 if let Some(char_under_cursor) = right.chars().next() {
                     let rest = &right[char_under_cursor.len_utf8()..];
                     print!("{}{}{}\r\n", left, char_under_cursor.to_string().black().on_white().bold(), rest);
@@ -93,7 +103,7 @@ fn main() -> io::Result<()>{
                     print!("{}{}\r\n", left, " ".to_string().black().on_white().bold());
                 }
             } else {
-                print!("{}\r\n", line);
+                print!("{}\r\n", visible_line);
             }
         }
         execute!(std::io::stdout(), MoveTo(0, height - 1))?;
@@ -205,10 +215,8 @@ fn main() -> io::Result<()>{
                                 continue;
                             }
                         }
-                        if cursor_x < (width as usize).saturating_sub(1) {
-                            lines[cursor_y].insert(cursor_x, c);
-                            cursor_x += 1;
-                        }
+                        lines[cursor_y].insert(cursor_x, c);
+                        cursor_x += 1;
                         is_modified = true;
                     },
                     KeyCode::Backspace => {
