@@ -133,7 +133,7 @@ fn main() -> io::Result<()> {
                 },
                 KeyCode::Enter | KeyCode::Right => {
                     if !entries.is_empty() {
-                        let name = entries[selected].name;
+                        let name = &entries[selected].name;
                         if entries[selected].is_dir {
                             let new_path = if path == "/" {
                                 format!("/{}", name)
