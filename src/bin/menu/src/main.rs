@@ -81,11 +81,17 @@ fn main() -> io::Result<()> {
                 KeyCode::Up => {
                     if selected > 0 {
                         selected -= 1;
+                    } else {
+                        selected = items.len() - 1;
                     }
                 },
                 KeyCode::Down => {
-                    if !items.is_empty() && selected < items.len() - 1 {
-                        selected += 1;
+                    if !items.is_empty() {    
+                        if selected < items.len() - 1 {
+                            selected += 1;
+                        } else {
+                            selected = 0;
+                        }
                     }
                 },
                 KeyCode::Char(c) if c.is_ascii_digit() => {
