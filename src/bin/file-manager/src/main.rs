@@ -132,16 +132,30 @@ fn main() -> io::Result<()> {
                     }
                 },
                 KeyCode::Enter | KeyCode::Right => {
-                    if !entries.is_empty() && entries[selected].is_dir {
-                        let new_path = if path == "/" {
-                            format!("/{}", entries[selected].name)
+                    if !entries.is_empty() {
+                        let name = entries[selected].name;
+                        if entries[selected].is_dir {
+                            let new_path = if path == "/" {
+                                format!("/{}", name)
+                            } else {
+                                format!("{}/{}", path, name)
+                            };
+                            entries = read_dir(&new_path)?;
+                            path = new_path;
+                            selected = 0;
+                            offset = 0;
                         } else {
-                            format!("{}/{}", path, entries[selected].name)
-                        };
-                        entries = read_dir(&new_path)?;
-                        path = new_path;
-                        selected = 0;
-                        offset = 0;
+                            disable_raw_mode()?;
+                            execute!(std::io::stdout(), crossterm::terminal::Clear(crossterm::terminal::ClearType::All), MoveTo(0, 0))?;
+                            std::io::stdout().flush()?;
+                            let full_path = if path == "/" {
+                                format!("/{}", name)
+                            } else {
+                                format!("{}/{}", path, name)
+                            };
+                            let _ = std::process::Command::new("/bin/editor").arg(&full_path).status();
+                            enable_raw_mode()?;
+                        }
                     }
                 }
                 KeyCode::Backspace | KeyCode::Left => {
