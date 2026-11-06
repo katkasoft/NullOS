@@ -124,11 +124,17 @@ fn main() -> io::Result<()> {
                 KeyCode::Up => {
                     if selected > 0 {
                         selected -= 1;
+                    } else {
+                        selected = entries.len() - 1;
                     }
                 },
                 KeyCode::Down => {
-                    if !entries.is_empty() && selected < entries.len() - 1 {
-                        selected += 1;
+                    if !entries.is_empty() {    
+                        if selected < entries.len() - 1 {
+                            selected += 1;
+                        } else {
+                            selected = 0;
+                        }
                     }
                 },
                 KeyCode::Enter | KeyCode::Right => {
