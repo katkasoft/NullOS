@@ -96,89 +96,89 @@ fn main() -> io::Result<()>{
             }
         }
         execute!(std::io::stdout(), MoveTo(0, height - 1))?;
-        let footer_text= " [^o] Open [^q] Quit [PgDn] Next page [PgUp] Previous page".to_string();
+        let footer_text= " [o] Open [q] Quit [PgDn] Next page [PgUp] Previous page [g/G] Top/Bottom".to_string();
         let padded_footer = format!("{:<width$}", footer_text, width = width as usize);
         print!("{}", padded_footer.black().on_white().bold());
         std::io::stdout().flush()?;
         if let Event::Key(key_event) = event::read()? {
-            if key_event.modifiers.contains(crossterm::event::KeyModifiers::CONTROL) {
-                match key_event.code {
-                    KeyCode::Char('q') => {
-                        break;
-                    },
-                    KeyCode::Char('o') => {
-                        let name = input("Enter filename: ")?;
-                        if !name.is_empty() {
-                            if let Ok(content) = fs::read_to_string(&name) {
-                                lines.clear();
-                                for line in content.lines() {
-                                    lines.push(line.to_string());
-                                }
-                                if lines.is_empty() {
-                                    lines.push(String::new());
-                                }
-                                filename = Some(name);
-                                cursor_x = 0;
-                                cursor_y = 0;
-                                offset = 0;
+            match key_event.code {
+                KeyCode::Char('q') => {
+                    break;
+                },
+                KeyCode::Char('o') => {
+                    let name = input("Enter filename: ")?;
+                    if !name.is_empty() {
+                        if let Ok(content) = fs::read_to_string(&name) {
+                            lines.clear();
+                            for line in content.lines() {
+                                lines.push(line.to_string());
                             }
+                            if lines.is_empty() {
+                                lines.push(String::new());
+                            }
+                            filename = Some(name);
+                            cursor_x = 0;
+                            cursor_y = 0;
+                            offset = 0;
                         }
                     }
-                    _ => {
-                        continue;
-                    }
                 }
-            } else {
-                match key_event.code {
-                    KeyCode::Up => {
+                KeyCode::Up => {
+                    if cursor_y > 0 {
+                        cursor_y -= 1;
+                        if cursor_x > lines[cursor_y].len() {
+                            cursor_x = lines[cursor_y].len();
+                        }
+                    }
+                },
+                KeyCode::Down => {
+                    if cursor_y < lines.len() - 1 {
+                        cursor_y += 1;
+                        if cursor_x > lines[cursor_y].len() {
+                            cursor_x = lines[cursor_y].len();
+                        }
+                    }
+                },
+                KeyCode::Left => {
+                    if cursor_x > 0 {
+                        cursor_x -= 1;
+                    } else {
                         if cursor_y > 0 {
                             cursor_y -= 1;
-                            if cursor_x > lines[cursor_y].len() {
-                                cursor_x = lines[cursor_y].len();
-                            }
+                            cursor_x = lines[cursor_y].len();
                         }
-                    },
-                    KeyCode::Down => {
-                        if cursor_y < lines.len() - 1 {
-                            cursor_y += 1;
-                            if cursor_x > lines[cursor_y].len() {
-                                cursor_x = lines[cursor_y].len();
-                            }
-                        }
-                    },
-                    KeyCode::Left => {
-                        if cursor_x > 0 {
-                            cursor_x -= 1;
-                        } else {
-                            if cursor_y > 0 {
-                                cursor_y -= 1;
-                                cursor_x = lines[cursor_y].len();
-                            }
-                        }
-                    },
-                    KeyCode::Right => {
-                        if cursor_x < lines[cursor_y].len() {
-                            cursor_x += 1;
-                        } else {
-                            if cursor_y < lines.len() - 1 {
-                                cursor_x = 0;
-                                cursor_y += 1;
-                            }
-                        }
-                    },
-                    KeyCode::PageDown | KeyCode::Char(' ') => {
-                        cursor_y = (cursor_y + max_visible_items).min(lines.len().saturating_sub(1));
-                        cursor_x = 0;
-                    },
-                    KeyCode::PageUp => {
-                        cursor_y = cursor_y.saturating_sub(max_visible_items);
-                        cursor_x = 0;
                     }
-                    KeyCode::Esc => {
-                        break;
-                    },
-                    _ => {}
+                },
+                KeyCode::Right => {
+                    if cursor_x < lines[cursor_y].len() {
+                        cursor_x += 1;
+                    } else {
+                        if cursor_y < lines.len() - 1 {
+                            cursor_x = 0;
+                            cursor_y += 1;
+                        }
+                    }
+                },
+                KeyCode::PageDown | KeyCode::Char(' ') => {
+                    cursor_y = (cursor_y + max_visible_items).min(lines.len().saturating_sub(1));
+                    cursor_x = 0;
+                },
+                KeyCode::PageUp => {
+                    cursor_y = cursor_y.saturating_sub(max_visible_items);
+                    cursor_x = 0;
                 }
+                KeyCode::Char('g') => {
+                    cursor_y = 0;
+                    cursor_x = 0;
+                },
+                KeyCode::Char('G') => {
+                    cursor_y = lines.len().saturating_sub(1);
+                    cursor_x = 0;
+                },
+                KeyCode::Esc => {
+                    break;
+                },
+                _ => {}
             }
         }
     }
