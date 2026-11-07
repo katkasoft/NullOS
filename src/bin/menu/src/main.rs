@@ -1,4 +1,4 @@
-use std::{fs, io, env};
+use std::{env, format, fs, io};
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 use crossterm::terminal::{enable_raw_mode, disable_raw_mode};
@@ -55,11 +55,12 @@ fn main() -> io::Result<()> {
     let mut selected: usize = 0;
     let mut offset: usize = 0;
     loop {
-        let (_width, height) = terminal::size()?;
+        let (width, height) = terminal::size()?;
         let max_visible_items = height.saturating_sub(2) as usize;
         execute!(std::io::stdout(), crossterm::terminal::Clear(crossterm::terminal::ClearType::All), MoveTo(0, 0))?; 
-        print!("=== NullOS Menu ===\r\n");
-        print!("\r\n");
+        let header_text = " NullOS Menu".to_string();
+        let padded_header = format!("{:<width$}", header_text, width = width as usize);
+        print!("{}\r\n", padded_header.black().on_white().bold());
         if selected < offset {
             offset = selected;
         }
@@ -75,6 +76,10 @@ fn main() -> io::Result<()> {
                 print!("  {}. {}\r\n", index, item.label);
             }
         }
+        execute!(std::io::stdout(), MoveTo(0, height - 1))?;
+        let footer_text = " [q] Quit [Enter] Run".to_string();
+        let padded_footer = format!("{:<width$}", footer_text, width = width as usize);
+        print!("{}", padded_footer.black().on_white().bold());
         std::io::stdout().flush()?;
         if let Event::Key(key_event) = event::read()? {
             match key_event.code { 
