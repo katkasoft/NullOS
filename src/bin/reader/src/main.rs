@@ -96,7 +96,7 @@ fn main() -> io::Result<()>{
             }
         }
         execute!(std::io::stdout(), MoveTo(0, height - 1))?;
-        let footer_text= " [^o] Open [^q] Quit".to_string();
+        let footer_text= " [^o] Open [^q] Quit [PgDn] Next page [PgUp] Previous page".to_string();
         let padded_footer = format!("{:<width$}", footer_text, width = width as usize);
         print!("{}", padded_footer.black().on_white().bold());
         std::io::stdout().flush()?;
@@ -166,6 +166,14 @@ fn main() -> io::Result<()>{
                             }
                         }
                     },
+                    KeyCode::PageDown | KeyCode::Char(' ') => {
+                        cursor_y = (cursor_y + max_visible_items).min(lines.len().saturating_sub(1));
+                        cursor_x = 0;
+                    },
+                    KeyCode::PageUp => {
+                        cursor_y = cursor_y.saturating_sub(max_visible_items);
+                        cursor_x = 0;
+                    }
                     KeyCode::Esc => {
                         break;
                     },
