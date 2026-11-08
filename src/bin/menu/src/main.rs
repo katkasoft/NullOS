@@ -15,6 +15,32 @@ struct MenuItem {
     pause: bool,
 }
 
+fn uptime() -> io::Result<String> {
+    let contents = fs::read_to_string("/proc/uptime")?;
+    let word = contents.split_whitespace().next();
+    match word {
+        Some(uptime_str) => {
+            let secs: u64 = uptime_str.parse::<f64>()
+                .map(|f| f as u64)
+                .unwrap_or(0);
+            let days = secs / 86400;
+            let hours = (secs % 86400) / 3600;
+            let mins = (secs % 3600) / 60;
+            let secs_rem = secs % 60;
+            if days > 0 {
+                format!("up {}d {}h {}m {}s", days, hours, mins, secs_rem)
+            } else if hours > 0 {
+                format!("up {}h {}m {}s", hours, mins, secs_rem)
+            } else if mins > 0 {
+                format!("up {}m {}s", mins, secs_rem)
+            } else {
+                format!("up {}s", secs_rem)
+            }
+        },
+        None => "0s".to_string(),
+    }
+}
+
 fn main() -> io::Result<()> {
     let args: Vec<String> = env::args().collect();
     if args.len() >= 2 && args[1] == "--help" {
@@ -78,9 +104,10 @@ fn main() -> io::Result<()> {
             }
         }        
         let now = chrono::Local::now();
-        let time_str = now.format("%H:%M:%S").to_string();
+        let time_str = now.format("%H:%M:%S %Y-%m-%d").to_string();
+        let uptime_str = uptime()?;
         execute!(std::io::stdout(), MoveTo(0, height - 1))?;
-        let footer_text = format!("{}", time_str);
+        let footer_text = format!(" {} {}", time_str, uptime_str);
         let padded_footer = format!("{:<width$}", footer_text, width = width as usize);
         print!("{}", padded_footer.black().on_white().bold());
         std::io::stdout().flush()?;
