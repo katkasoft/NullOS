@@ -7,6 +7,7 @@ use crossterm::execute;
 use crossterm::cursor::MoveTo;
 use crossterm::style::Stylize;
 use crossterm::terminal;
+use std::time::Duration;
 
 struct MenuItem {
     label: String,
@@ -75,66 +76,70 @@ fn main() -> io::Result<()> {
             } else {
                 print!("  {}. {}\r\n", index, item.label);
             }
-        }
+        }        
+        let now = chrono::Local::now();
+        let time_str = now.format("%H:%M:%S").to_string();
         execute!(std::io::stdout(), MoveTo(0, height - 1))?;
-        let footer_text = " [q] Quit [Enter] Run".to_string();
+        let footer_text = format!("{}", time_str);
         let padded_footer = format!("{:<width$}", footer_text, width = width as usize);
         print!("{}", padded_footer.black().on_white().bold());
         std::io::stdout().flush()?;
-        if let Event::Key(key_event) = event::read()? {
-            match key_event.code { 
-                KeyCode::Up => {
-                    if selected > 0 {
-                        selected -= 1;
-                    } else {
-                        selected = items.len() - 1;
-                    }
-                },
-                KeyCode::Down => {
-                    if !items.is_empty() {    
-                        if selected < items.len() - 1 {
-                            selected += 1;
+        if event::poll(Duration::from_secs(1))? {
+            if let Event::Key(key_event) = event::read()? {
+                match key_event.code { 
+                    KeyCode::Up => {
+                        if selected > 0 {
+                            selected -= 1;
                         } else {
-                            selected = 0;
+                            selected = items.len() - 1;
                         }
-                    }
-                },
-                KeyCode::Char(c) if c.is_ascii_digit() => {
-                    let target_index = (c as u8 - b'0') as usize;
-                    if target_index < items.len() {
-                        selected = target_index;
-                    }
-                },
-                KeyCode::Enter => {
-                    if items.is_empty() { continue; }
-                    let action = &items[selected].action;
-                    disable_raw_mode()?;
-                    execute!(std::io::stdout(), crossterm::terminal::Clear(crossterm::terminal::ClearType::All), MoveTo(0, 0))?;
-                    std::io::stdout().flush()?;
-                    let mut parts = action.split_whitespace();
-                    if let Some(cmd) = parts.next() {
-                        let args: Vec<&str> = parts.collect();
-                        match std::process::Command::new(cmd).args(&args).status() {
-                            Ok(_) => {
-                                if items[selected].pause {
-                                    print!("\r\nPress Enter to return to menu...");
-                                    std::io::stdout().flush()?;
-                                    let mut dummy = String::new();
-                                    let _ = std::io::stdin().read_line(&mut dummy);
-                                }
-                            },
-                            Err(e) => {
-                                eprintln!("Failed to run {}: {}", cmd, e);
-                                let _ = std::io::stdin().read_line(&mut String::new());
+                    },
+                    KeyCode::Down => {
+                        if !items.is_empty() {    
+                            if selected < items.len() - 1 {
+                                selected += 1;
+                            } else {
+                                selected = 0;
                             }
                         }
-                    }
-                    enable_raw_mode()?;
-                },
-                KeyCode::Esc | KeyCode::Char('q') => {
-                    break;
-                },
-                _ => {}
+                    },
+                    KeyCode::Char(c) if c.is_ascii_digit() => {
+                        let target_index = (c as u8 - b'0') as usize;
+                        if target_index < items.len() {
+                            selected = target_index;
+                        }
+                    },
+                    KeyCode::Enter => {
+                        if items.is_empty() { continue; }
+                        let action = &items[selected].action;
+                        disable_raw_mode()?;
+                        execute!(std::io::stdout(), crossterm::terminal::Clear(crossterm::terminal::ClearType::All), MoveTo(0, 0))?;
+                        std::io::stdout().flush()?;
+                        let mut parts = action.split_whitespace();
+                        if let Some(cmd) = parts.next() {
+                            let args: Vec<&str> = parts.collect();
+                            match std::process::Command::new(cmd).args(&args).status() {
+                                Ok(_) => {
+                                    if items[selected].pause {
+                                        print!("\r\nPress Enter to return to menu...");
+                                        std::io::stdout().flush()?;
+                                        let mut dummy = String::new();
+                                        let _ = std::io::stdin().read_line(&mut dummy);
+                                    }
+                                },
+                                Err(e) => {
+                                    eprintln!("Failed to run {}: {}", cmd, e);
+                                    let _ = std::io::stdin().read_line(&mut String::new());
+                                }
+                            }
+                        }
+                        enable_raw_mode()?;
+                    },
+                    KeyCode::Esc | KeyCode::Char('q') => {
+                        break;
+                    },
+                    _ => {}
+                }
             }
         }
     }
