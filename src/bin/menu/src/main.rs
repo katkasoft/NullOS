@@ -28,16 +28,16 @@ fn uptime() -> io::Result<String> {
             let mins = (secs % 3600) / 60;
             let secs_rem = secs % 60;
             if days > 0 {
-                format!("up {}d {}h {}m {}s", days, hours, mins, secs_rem)
+                Ok(format!("up {}d {}h {}m {}s", days, hours, mins, secs_rem))
             } else if hours > 0 {
-                format!("up {}h {}m {}s", hours, mins, secs_rem)
+                Ok(format!("up {}h {}m {}s", hours, mins, secs_rem))
             } else if mins > 0 {
-                format!("up {}m {}s", mins, secs_rem)
+                Ok(format!("up {}m {}s", mins, secs_rem))
             } else {
-                format!("up {}s", secs_rem)
+                Ok(format!("up {}s", secs_rem))
             }
         },
-        None => "0s".to_string(),
+        None => Ok("0s".to_string()),
     }
 }
 
