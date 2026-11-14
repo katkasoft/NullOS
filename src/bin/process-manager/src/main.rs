@@ -11,7 +11,8 @@ use rustix::process::{kill_process, Pid, Signal};
 
 struct Process {
     pid: u32,
-    cmdline: String
+    cmdline: String,
+    memory_mb: u64
 }
 
 fn read_processes() -> io::Result<Vec<Process>> {
@@ -39,9 +40,21 @@ fn read_processes() -> io::Result<Vec<Process>> {
                         .collect::<Vec<_>>()
                         .join(" ")
                 };
+                let content = fs::read_to_string(format!("/proc/{}/status", pid)).unwrap_or_default();
+                let mut memory_mb: u64 = 0;
+                for line in content.lines() {
+                    if line.starts_with("VmRSS:") {
+                        if let Some(val) = line.split_whitespace().nth(1) {
+                            if let Ok(kb) = val.parse::<u64>() {
+                                memory_mb = kb / 1024;
+                            }
+                        }
+                    }
+                }
                 let process = Process {
                     pid: pid,
-                    cmdline: cmd
+                    cmdline: cmd,
+                    memory_mb: memory_mb,
                 };
                 vec.push(process);
             }
@@ -72,9 +85,10 @@ fn main() -> io::Result<()> {
         let (width, height) = terminal::size()?;
         let max_visible_items = height.saturating_sub(2) as usize;
         execute!(std::io::stdout(), crossterm::terminal::Clear(crossterm::terminal::ClearType::All), MoveTo(0, 0))?;
-        let header_text = "NullOS process manager";
-        let padded_header = format!("{:<width$}", header_text, width = width as usize);
+        let padded_header = " NullOS Process Manager".to_string();
         print!("{}\r\n", padded_header.black().on_white().bold());
+        let padded_header2 = format!("  {:<5}  {:<7}  {}\r\n", "PID", "MEM", "COMMAND");
+        print!("{}\r\n", padded_header2.black().on_white().bold());
         if selected < offset {
             offset = selected;
         }
@@ -84,10 +98,11 @@ fn main() -> io::Result<()> {
         let end = (offset + max_visible_items).min(processes.len());
         for index in offset..end {
             let item = &processes[index];
+            let line_str = format!("{:>5}  {:>4} MB  {}", item.pid, item.memory_mb, item.cmdline); 
             if index == selected {
-                print!("{}\r\n", format!("> {}. {}", item.pid, item.cmdline).red().bold());
+                print!("{}\r\n", format!("> {}", line_str).red().bold());
             } else {
-                print!("  {}. {}\r\n", item.pid, item.cmdline);
+                print!("  {}\r\n", line_str);
             }
         }
         execute!(std::io::stdout(), MoveTo(0, height - 1))?;
