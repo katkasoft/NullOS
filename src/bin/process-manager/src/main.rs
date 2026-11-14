@@ -83,11 +83,11 @@ fn main() -> io::Result<()> {
     let mut offset = 0;
     loop {
         let (width, height) = terminal::size()?;
-        let max_visible_items = height.saturating_sub(2) as usize;
+        let max_visible_items = height.saturating_sub(3) as usize;
         execute!(std::io::stdout(), crossterm::terminal::Clear(crossterm::terminal::ClearType::All), MoveTo(0, 0))?;
         let padded_header = " NullOS Process Manager".to_string();
         print!("{}\r\n", padded_header.black().on_white().bold());
-        let padded_header2 = format!("  {:<5}  {:<7}  {}\r\n", "PID", "MEM", "COMMAND");
+        let padded_header2 = format!("  {:<5}  {:<7}  {}", "PID", "MEM", "COMMAND");
         print!("{}\r\n", padded_header2.black().on_white().bold());
         if selected < offset {
             offset = selected;
