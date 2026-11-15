@@ -71,23 +71,12 @@ fn read_processes() -> io::Result<Vec<Process>> {
     Ok(vec)
 }
 
-fn kill(pid: i32) {
-    let sig: i32 = 15;
-    let raw_pid = match Pid::from_raw(pid) {
-        Some(p) => p,
-        None => {
-            eprintln!("Invalid PID.");
-            std::process::exit(1)
+fn kill(pid: i32, sig: i32) {
+    if let Some(raw_pid) = Pid::from_raw(pid) {
+        if let Some(signal) = Signal::from_raw(sig) {
+            let _ = kill_process(raw_pid, signal);
         }
-    };
-    let sig = match Signal::from_raw(sig) {
-        Some(s) => s,
-        None => {
-            eprintln!("Invalid numeric signal number: {}", sig);
-            std::process::exit(1)
-        }
-    };
-    let _ = kill_process(raw_pid, sig);
+    }
 }
 
 fn main() -> io::Result<()> {
@@ -114,7 +103,7 @@ fn main() -> io::Result<()> {
         let header_text = " NullOS Process Manager".to_string();
         let padded_header = format!("{:<width$}", header_text, width = width as usize);
         print!("{}\r\n", padded_header.black().on_white().bold());
-        let header2_text =  format!("  {:<5} {:>4}    {:<4} {}", "PID", "MEM", "STAT", "COMMAND");
+        let header2_text =  format!("  {:<5} {:>7}    {:<4} {}", "PID", "MEM", "STAT", "COMMAND");
         let padded_header2 =format!("{:<width$}", header2_text, width = width as usize);
         print!("{}\r\n", padded_header2.black().on_white().bold());
         if selected < offset {
@@ -134,7 +123,7 @@ fn main() -> io::Result<()> {
             }
         }
         execute!(std::io::stdout(), MoveTo(0, height - 1))?;
-        let footer_text = "[q] Quit [k] Kill process";
+        let footer_text = " [q] Quit [t] Term [k] Kill (9)";
         let padded_footer = format!("{:<width$}", footer_text, width = width as usize);
         print!("{}", padded_footer.black().on_white().bold());
         std::io::stdout().flush()?;
@@ -159,10 +148,16 @@ fn main() -> io::Result<()> {
                             }
                         }
                     },
-                    KeyCode::Delete | KeyCode::Char('k') => {
+                    KeyCode::Delete | KeyCode::Char('t') => {
                         if !processes.is_empty() {
                             let pid = processes[selected].pid as i32;
-                            kill(pid);
+                            kill(pid, 15);
+                        }
+                    },
+                    KeyCode::Char('k') => {
+                        if !processes.is_empty() {
+                            let pid = processes[selected].pid as i32;
+                            kill(pid, 9);
                         }
                     }
                     KeyCode::Char('q') => {
