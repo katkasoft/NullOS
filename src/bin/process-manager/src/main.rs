@@ -85,9 +85,11 @@ fn main() -> io::Result<()> {
         let (width, height) = terminal::size()?;
         let max_visible_items = height.saturating_sub(3) as usize;
         execute!(std::io::stdout(), crossterm::terminal::Clear(crossterm::terminal::ClearType::All), MoveTo(0, 0))?;
-        let padded_header = " NullOS Process Manager".to_string();
+        let header_text = " NullOS Process Manager".to_string();
+        let padded_header = format!("{:<width$}", header_text, width = width as usize);
         print!("{}\r\n", padded_header.black().on_white().bold());
-        let padded_header2 = format!("  {:<5}  {:<7}  {}", "PID", "MEM", "COMMAND");
+        let header2_text =  format!("  {:<5}  {:<7}  {}", "PID", "MEM", "COMMAND");
+        let padded_header2 =format!("{:<width$}", header2_text, width = width as usize);
         print!("{}\r\n", padded_header2.black().on_white().bold());
         if selected < offset {
             offset = selected;
@@ -98,7 +100,7 @@ fn main() -> io::Result<()> {
         let end = (offset + max_visible_items).min(processes.len());
         for index in offset..end {
             let item = &processes[index];
-            let line_str = format!("{:>5}  {:>4} MB  {}", item.pid, item.memory_mb, item.cmdline); 
+            let line_str = format!("{:<5} {:>4} MB  {}", item.pid, item.memory_mb, item.cmdline); 
             if index == selected {
                 print!("{}\r\n", format!("> {}", line_str).red().bold());
             } else {
