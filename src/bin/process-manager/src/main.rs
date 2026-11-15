@@ -12,7 +12,8 @@ use rustix::process::{kill_process, Pid, Signal};
 struct Process {
     pid: u32,
     cmdline: String,
-    memory_mb: u64
+    memory_mb: u64,
+    state: String
 }
 
 fn read_processes() -> io::Result<Vec<Process>> {
@@ -42,6 +43,7 @@ fn read_processes() -> io::Result<Vec<Process>> {
                 };
                 let content = fs::read_to_string(format!("/proc/{}/status", pid)).unwrap_or_default();
                 let mut memory_mb: u64 = 0;
+                let mut state = String::new();
                 for line in content.lines() {
                     if line.starts_with("VmRSS:") {
                         if let Some(val) = line.split_whitespace().nth(1) {
@@ -49,12 +51,17 @@ fn read_processes() -> io::Result<Vec<Process>> {
                                 memory_mb = kb / 1024;
                             }
                         }
+                    } else if line.starts_with("State:") {
+                        if let Some(val) = line.split_whitespace().nth(1) {
+                            state = val.to_string();
+                        }
                     }
                 }
                 let process = Process {
-                    pid: pid,
+                    pid,
                     cmdline: cmd,
-                    memory_mb: memory_mb,
+                    memory_mb,
+                    state
                 };
                 vec.push(process);
             }
@@ -62,6 +69,25 @@ fn read_processes() -> io::Result<Vec<Process>> {
     }
     vec.sort_by(|a, b| a.pid.cmp(&b.pid));
     Ok(vec)
+}
+
+fn kill(pid: i32) {
+    let sig: i32 = 15;
+    let raw_pid = match Pid::from_raw(pid) {
+        Some(p) => p,
+        None => {
+            eprintln!("Invalid PID.");
+            std::process::exit(1)
+        }
+    };
+    let sig = match Signal::from_raw(sig) {
+        Some(s) => s,
+        None => {
+            eprintln!("Invalid numeric signal number: {}", sig);
+            std::process::exit(1)
+        }
+    };
+    let _ = kill_process(raw_pid, sig);
 }
 
 fn main() -> io::Result<()> {
@@ -88,7 +114,7 @@ fn main() -> io::Result<()> {
         let header_text = " NullOS Process Manager".to_string();
         let padded_header = format!("{:<width$}", header_text, width = width as usize);
         print!("{}\r\n", padded_header.black().on_white().bold());
-        let header2_text =  format!("  {:<5}  {:<7}  {}", "PID", "MEM", "COMMAND");
+        let header2_text =  format!("  {:<5} {:>4}    {:<4} {}", "PID", "MEM", "STAT", "COMMAND");
         let padded_header2 =format!("{:<width$}", header2_text, width = width as usize);
         print!("{}\r\n", padded_header2.black().on_white().bold());
         if selected < offset {
@@ -100,7 +126,7 @@ fn main() -> io::Result<()> {
         let end = (offset + max_visible_items).min(processes.len());
         for index in offset..end {
             let item = &processes[index];
-            let line_str = format!("{:<5} {:>4} MB  {}", item.pid, item.memory_mb, item.cmdline); 
+            let line_str = format!("{:<5} {:>4} MB {:<4} {}", item.pid, item.memory_mb, item.state, item.cmdline);
             if index == selected {
                 print!("{}\r\n", format!("> {}", line_str).red().bold());
             } else {
@@ -116,10 +142,12 @@ fn main() -> io::Result<()> {
             if let Event::Key(key_event) = event::read()? {
                 match key_event.code {
                     KeyCode::Up => {
-                        if selected > 0 {
-                            selected -= 1;
-                        } else {
-                            selected = processes.len() - 1;
+                        if !processes.is_empty() {
+                            if selected > 0 {
+                                selected -= 1;
+                            } else {
+                                selected = processes.len() - 1;
+                            }
                         }
                     },
                     KeyCode::Down => {
@@ -133,25 +161,8 @@ fn main() -> io::Result<()> {
                     },
                     KeyCode::Delete | KeyCode::Char('k') => {
                         if !processes.is_empty() {
-                            let sig: i32 = 15;
-                            let raw_pid = processes[selected].pid as i32;
-                            let pid = match Pid::from_raw(raw_pid) {
-                                Some(p) => p,
-                                None => {
-                                    eprintln!("Invalid PID.");
-                                    std::process::exit(1)
-                                }
-                            };
-                            let sig = match Signal::from_raw(sig) {
-                                Some(s) => s,
-                                None => {
-                                    eprintln!("Invalid numeric signal number: {}", sig);
-                                    std::process::exit(1)
-                                }
-                            };
-                            if let Err(e) = kill_process(pid, sig) {
-                                eprintln!("Failed to kill process: {}", e)
-                            }
+                            let pid = processes[selected].pid as i32;
+                            kill(pid);
                         }
                     }
                     KeyCode::Char('q') => {
