@@ -16,7 +16,7 @@ struct Process {
     state: String
 }
 
-fn read_processes() -> io::Result<Vec<Process>> {
+fn read_processes(sort_by_memory: bool) -> io::Result<Vec<Process>> {
     let mut vec = Vec::new();
     if let Ok(entries) = fs::read_dir("/proc") {
         for entry in entries.flatten() {
@@ -67,7 +67,11 @@ fn read_processes() -> io::Result<Vec<Process>> {
             }
         }
     }
-    vec.sort_by(|a, b| a.pid.cmp(&b.pid));
+    if sort_by_memory {
+        vec.sort_by(|a, b| a.memory_mb.cmp(&b.memory_mb));
+    } else {
+        vec.sort_by(|a, b| a.pid.cmp(&b.pid));
+    }
     Ok(vec)
 }
 
@@ -93,9 +97,10 @@ fn main() -> io::Result<()> {
     }
     print!("\x1B[2J\x1B[1;1H");
     enable_raw_mode()?;
-    let mut processes = read_processes()?;
     let mut selected: usize = 0;
     let mut offset = 0;
+    let mut sort_by_memory = false;
+    let mut processes = read_processes(sort_by_memory)?;
     loop {
         let (width, height) = terminal::size()?;
         let max_visible_items = height.saturating_sub(3) as usize;
@@ -123,7 +128,7 @@ fn main() -> io::Result<()> {
             }
         }
         execute!(std::io::stdout(), MoveTo(0, height - 1))?;
-        let footer_text = " [q] Quit [t] Term [k] Kill (9)";
+        let footer_text = " [q] Quit [t] Term (15) [k] Kill (9) [m] Sort by memory";
         let padded_footer = format!("{:<width$}", footer_text, width = width as usize);
         print!("{}", padded_footer.black().on_white().bold());
         std::io::stdout().flush()?;
@@ -159,6 +164,9 @@ fn main() -> io::Result<()> {
                             let pid = processes[selected].pid as i32;
                             kill(pid, 9);
                         }
+                    },
+                    KeyCode::Char('m') => {
+                        sort_by_memory = !sort_by_memory;
                     }
                     KeyCode::Char('q') => {
                         break;
@@ -167,7 +175,7 @@ fn main() -> io::Result<()> {
                 }
             }
         }
-        processes = read_processes()?;
+        processes = read_processes(sort_by_memory)?;
         if selected >= processes.len() && !processes.is_empty() {
             selected = processes.len() - 1;
         } else if processes.is_empty() {
