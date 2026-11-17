@@ -68,7 +68,7 @@ fn read_processes(sort_by_memory: bool) -> io::Result<Vec<Process>> {
         }
     }
     if sort_by_memory {
-        vec.sort_by(|a, b| b.memory_mb.cmp(&a.memory_mb)); // <--- БЫЛО a.cmp(b), СТАЛО b.cmp(a)
+        vec.sort_by(|a, b| b.memory_mb.cmp(&a.memory_mb));
     } else {
         vec.sort_by(|a, b| a.pid.cmp(&b.pid));
     }
@@ -108,7 +108,7 @@ fn main() -> io::Result<()> {
         let header_text = " NullOS Process Manager".to_string();
         let padded_header = format!("{:<width$}", header_text, width = width as usize);
         print!("{}\r\n", padded_header.black().on_white().bold());
-        let header2_text = format!("{:<6} {:>5}    {:<4} {}", "PID", "MEM", "STAT", "COMMAND");
+        let header2_text = format!(" {:<6} {:>9} {:<4} {}", "PID", "MEM", "STAT", "COMMAND");
         let padded_header2 =format!("{:<width$}", header2_text, width = width as usize);
         print!("{}\r\n", padded_header2.black().on_white().bold());
         if selected < offset {
