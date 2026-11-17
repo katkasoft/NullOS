@@ -68,7 +68,7 @@ fn read_processes(sort_by_memory: bool) -> io::Result<Vec<Process>> {
         }
     }
     if sort_by_memory {
-        vec.sort_by(|a, b| a.memory_mb.cmp(&b.memory_mb));
+        vec.sort_by(|a, b| b.memory_mb.cmp(&a.memory_mb)); // <--- БЫЛО a.cmp(b), СТАЛО b.cmp(a)
     } else {
         vec.sort_by(|a, b| a.pid.cmp(&b.pid));
     }
@@ -108,7 +108,7 @@ fn main() -> io::Result<()> {
         let header_text = " NullOS Process Manager".to_string();
         let padded_header = format!("{:<width$}", header_text, width = width as usize);
         print!("{}\r\n", padded_header.black().on_white().bold());
-        let header2_text =  format!("  {:<5} {:>7}    {:<4} {}", "PID", "MEM", "STAT", "COMMAND");
+        let header2_text = format!("{:<6} {:>5}    {:<4} {}", "PID", "MEM", "STAT", "COMMAND");
         let padded_header2 =format!("{:<width$}", header2_text, width = width as usize);
         print!("{}\r\n", padded_header2.black().on_white().bold());
         if selected < offset {
@@ -120,7 +120,7 @@ fn main() -> io::Result<()> {
         let end = (offset + max_visible_items).min(processes.len());
         for index in offset..end {
             let item = &processes[index];
-            let line_str = format!("{:<5} {:>4} MB {:<4} {}", item.pid, item.memory_mb, item.state, item.cmdline);
+            let line_str = format!("{:<6} {:>5} MB {:<4} {}", item.pid, item.memory_mb, item.state, item.cmdline);
             if index == selected {
                 print!("{}\r\n", format!("> {}", line_str).red().bold());
             } else {
@@ -167,6 +167,8 @@ fn main() -> io::Result<()> {
                     },
                     KeyCode::Char('m') => {
                         sort_by_memory = !sort_by_memory;
+                        selected = 0;
+                        offset = 0;
                     }
                     KeyCode::Char('q') => {
                         break;
